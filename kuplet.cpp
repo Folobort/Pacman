@@ -48,7 +48,7 @@ class kuplet{
 		}
 		
 		next_element = firstElement(i-1, width, height); /// "retour chariot"
-		next_element.push_back(element[i-1].right(width)); /// décalage
+		next_element.push_back(element[i-1].next(width)); /// décalage
 		for (int p = i; p<k; p++){ /// copie du reste
 			next_element.push_back(element[p]);
 		}
@@ -66,7 +66,7 @@ class kuplet{
 		first_element.push_back(Point(0,0));
 		
 		for(unsigned i=0; i<size; i++){
-			first_element.push_back(first_element[i].right(width));
+			first_element.push_back(first_element[i].next(width));
 		}
 
 		return first_element;
