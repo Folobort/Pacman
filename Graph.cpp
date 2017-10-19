@@ -18,6 +18,26 @@ Graph::Graph(){}
 
 void Graph::setMatrix(vector<vector<bool>> matrix){
 	this->matrix = matrix;
+	
+	neighbors = vector<vector<vector<Point>>> (matrix.size(), vector<vector<Point>> (matrix[0].size()));
+	
+	for(unsigned x=0; x<matrix.size(); x++){
+		for(unsigned y=0; y<matrix[0].size(); y++){
+			if(x > 0 && !isWall(x,y)){ // If not on left edge nor wall, then notify left neighbor
+				neighbors[x-1][y].push_back(Point(x,y));
+			}
+			if(x < matrix.size()-1 && !isWall(x,y)){
+				neighbors[x+1][y].push_back(Point(x,y));
+			}
+			if(y < 0 && !isWall(x,y)){
+				neighbors[x][y-1].push_back(Point(x,y));
+			}
+			if(y < matrix[0].size()-1 && !isWall(x,y)){
+				neighbors[x][y+1].push_back(Point(x,y));
+			}
+		}
+	}
+	
 	dist = vector<vector<unsigned>> (matrix.size(), vector<unsigned>(matrix[0].size(), INFINITY));
 }
 
@@ -125,10 +145,96 @@ unsigned Graph::bestDijkstra(unsigned k){
 	}
 }
 
+unsigned Graph::degreeOf(Point point){
+	return neighbors[point.x()][point.y()].size();
+}
+
+
+Point Graph::getSmallDegreeUndominated(vector<Point> S){
+	unsigned smallestDeg = 5;
+	Point point = Point(0,0);
+	
+	for(unsigned x=0; x<matrix.size(); x++){
+		for(unsigned y=0; y<matrix[0].size(); y++){
+			if(Point(x,y).isInVector(S) || isWall(x,y)){
+				continue;
+			}
+			
+			unsigned deg = degreeOf(Point(x,y));
+			if(deg < smallestDeg){
+				smallestDeg = deg;
+				point = Point(x,y);
+			}
+		}
+	}
+	
+	return point;
+}
+
+vector<Point> Graph::getNeighbors(Point point){
+	vector<Point> neighborExtended = neighbors[point.x()][point.y()];
+	neighborExtended.push_back(point);
+	
+	return neighborExtended;
+}
+
+
+
+
+vector<Point> Graph::getNeighborsUndominating(Point point, vector<Point> S){
+	vector<Point> neighbors = getNeighbors(point);
+	vector<Point> neighborsUndominating;
+	
+	for(unsigned i=0; i<neighbors.size(); i++){
+		if(!neighbors[i].isInVector(S)){
+			neighborsUndominating.push_back(neighbors[i]);
+		}
+	}
+	
+	return neighborsUndominating;
+}
+
+
+
+
+vector<Point> Graph::k_dominant(unsigned k, vector<Point> S){
+	if(S.size() == k){
+		if(isDominatedBy(S)){
+			return S;
+		}
+		vector<Point> emptyV;
+		return emptyV; /// Empty vector on failure
+	}
+	
+	Point v = getSmallDegreeUndominated(S);
+	
+	cout << "======================================" << endl;
+	cout << "v (" << degreeOf(v) << "): " << v.x() << " " << v.y() << endl;
+	
+	vector<Point> neighbors = getNeighborsUndominating(v, S);
+	
+	for(unsigned i=0; i<neighbors.size(); i++){
+		
+		//cout << "N: " << neighbors[i].x() << ", " << neighbors[i].y() << endl;
+		
+		vector<Point> S2 = S;
+		S2.push_back(neighbors[i]);
+		
+		if(k_dominant(k, S2).size() != 0){
+			return S2;
+		}
+	}
+	
+	vector<Point> emptyV;
+	return emptyV; /// All sub-S failed
+}
+
+
+
 
 
 int main(){
-	unsigned k = 1;
+	unsigned k = 10;
 	
 	
 	Parser p;
@@ -138,13 +244,27 @@ int main(){
 	Graph g = Graph();
 	g.setMatrix(matrix);
 	
-	//cout << Point(0,1).next(512).x() << ", " << Point(0,1).next(512).y() << endl;
+	//unsigned bestDist = g.bestDijkstra(k);
 	
-	unsigned bestDist = g.bestDijkstra(k);
-	
-	cout << endl;
-	cout << "best dist with k = " << k << " : " << bestDist << endl;
+	//cout << endl;
+	//cout << "best dist with k = " << k << " : " << bestDist << endl;
 
+	
+	vector<Point> emptyV;
+	vector<Point> kDom = g.k_dominant(k, emptyV);
+	
+	if(kDom.size() != 0){
+		cout << "Works with set of size " << k << ":" << endl;
+		for(unsigned i=0; i<k-1; i++){
+			cout << kDom[i].toString() << ", ";
+		}
+		cout << kDom[k-1].toString() << endl;
+	} else{
+		cout << "Does not work with set of size " << k << endl;
+	}
+	
+	
+	
 	return 0;
 }
 

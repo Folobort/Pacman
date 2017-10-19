@@ -19,6 +19,7 @@ const unsigned INFINITY = -1;
 class Graph{
 	// DATA
 	vector<vector<bool>> matrix; // False for wall
+	vector<vector<vector<Point>>> neighbors;
 	vector<vector<bool>> processed;
 	vector<vector<unsigned>> dist;
 	unsigned INFINITY;
@@ -36,6 +37,14 @@ class Graph{
 	unsigned makeDijkstra(vector<Point> tuple);
 	
 	unsigned bestDijkstra(unsigned k);
+	
+	unsigned degreeOf(Point point);
+	
+	Point getSmallDegreeUndominated(vector<Point> S);
+	vector<Point> getNeighbors(Point point);
+	vector<Point> getNeighborsUndominating(Point point, vector<Point> S);
+	
+	vector<Point> k_dominant(unsigned k, vector<Point> S);
 };
 
 

@@ -77,3 +77,27 @@ bool Point::equals(Point point){
 	return (coordX == point.x()) && (coordY == point.y());
 }
 
+
+bool Point::isInVector(vector<Point> S){
+	for(unsigned i=0; i<S.size(); i++){
+		if(equals(S[i])){
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+string Point::toString(){
+	stringstream ss;
+	ss << "(" << x() << "," << y() << ")";
+	
+	return ss.str();	
+}
+
+
+
+
+
+
+

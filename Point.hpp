@@ -1,6 +1,17 @@
 #ifndef POINT_H_
 #define POINT_H_
 
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <algorithm>
+
+using namespace std;
+
 class Point{
 	// DATA
 	unsigned coordX;
@@ -27,6 +38,10 @@ class Point{
 	Point copy();
 	
 	bool equals(Point point);
+	
+	bool isInVector(vector<Point> S);
+	
+	string toString();
 };
 
 
