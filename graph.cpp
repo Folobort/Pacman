@@ -40,32 +40,93 @@ void Graph::setMatrix(vector<vector<bool>> matrix){
 
 	dist = vector<vector<unsigned>> (matrix.size(), vector<unsigned>(matrix[0].size(), INFINITY));
 }
+
 void Graph::treeDecomposition(){
-    vector<Point> bag; //a bag contain each step of the tree decomposition starting with first line
-    Point p = Point(0,0);
-    unsigned k = 0;
-    //Create first bag
-    for(unsigned i=0; i<matrix.size(); i++){
-        bag.push_back(p);
-        p = p.next(matrix.size());
-    }
-    bag.push_back(Point(1,0));
+    vector<Point> bag = firstBag();
+    
     //Add bag to the tree decomposition
     tree.push_back(bag);
+    cout << "First bag" << endl;
+	
     //Update bag
-    Point lastPoint = bag[bag.end()];
-    while(!lastPoint.isLast()){
-        bag.push_back(lastPoint.left());
-        bag.erase(bag.begin());
-        Point lastPoint = bag[bag.end()];
-        tree.push_back(bag);
-    }
-
+    Point lastValid = lastNoWall();
+    cout << "Last valid: (" << lastValid.x() << "," << lastValid.y() << ")" << endl;
+    /// (42,512)
+    
+    unsigned k = 0;
+    while(!(bag.back().equals(lastValid))){
+		bag = nextBag(bag);
+		tree.push_back(bag);
+		
+		k++;
+		cout << "Next bag " << k << ", bag.back = (" << bag.back().x() << "," << bag.back().y() << ")" << endl;
+	}
 }
+
+vector<Point> Graph::firstBag(){
+	vector<Point> bag; //a bag contain each step of the tree decomposition starting with first line
+    Point p = Point(0,0);
+    while(isWall(p)){
+		p=p.next(matrix.size());
+	}
+    bag.push_back(p); // first no-wall Point
+    while(bag.size()<matrix.size()+1){
+        p = p.next(matrix.size());
+        while(isWall(p)){
+			p=p.next(matrix.size());
+		}
+        bag.push_back(p);
+    }
+	
+	return bag;
+}
+
+vector<Point> Graph::nextBag(vector<Point> bag){
+	Point nextAdd = bag.back().next(matrix.size());
+	while(!nextAdd.isLast(matrix.size(), matrix[0].size()) && !isWall(nextAdd)){
+		nextAdd = nextAdd.next(matrix.size());
+	}
+	
+	/* Should not be called normally
+	if(nextAdd.isLast && nextAdd.isWall){
+		return bag;
+		// bag was last valid bag, abort somehow
+	}
+	*/
+	
+	cout << "NextAdd: (" << nextAdd.x() << "," << nextAdd.y() << ")" << endl;
+	
+	
+	
+	bag.erase(bag.begin());
+	bag.push_back(nextAdd);
+	
+	return bag;
+}
+
+
+
+Point Graph::lastNoWall(){
+	Point lastValid = Point(matrix.size()-1, matrix[0].size()-1);
+	
+	while(isWall(lastValid)){
+		lastValid = lastValid.before(matrix.size());
+	}
+
+	return lastValid;
+}
+
+
 
 bool Graph::isWall(unsigned x, unsigned y){
 	return !matrix[x][y];
 }
+
+bool Graph::isWall(Point p){
+	return isWall(p.x(), p.y());
+}
+
+
 
 bool Graph::isDominatedBy(vector<Point> tuple){
 		vector<vector<bool>> inTuple = vector<vector<bool>> (matrix.size(), vector<bool>(matrix[0].size(), false));
@@ -271,7 +332,7 @@ int main(){
 	//cout << endl;
 	//cout << "best dist with k = " << k << " : " << bestDist << endl;
 
-
+/* Branch and bound
 	vector<Point> emptyV;
 	vector<Point> kDom = g.k_dominant(k, emptyV);
 
@@ -284,6 +345,9 @@ int main(){
 	} else{
 		cout << "Does not work with set of size " << k << endl;
 	}
+*/
+
+	g.treeDecomposition();
 
 
 

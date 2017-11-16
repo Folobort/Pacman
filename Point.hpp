@@ -27,6 +27,7 @@ class Point{
 	unsigned position(unsigned width);
 	
 	Point next(unsigned width);
+	Point before(unsigned width);
 	
 	Point left();
 	Point right(unsigned width);

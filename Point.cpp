@@ -36,6 +36,14 @@ Point Point::next(unsigned width){
 	return Point(coordX+1, coordY);
 }
 
+Point Point::before(unsigned width){
+	if(coordX == 0){
+		return Point(width-1, coordY-1);
+	}
+	
+	return Point(coordX-1, coordY);
+}
+
 Point Point::left(){
 	if(coordX == 0){ // left side
 		throw new exception();

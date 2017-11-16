@@ -33,7 +33,14 @@ class Graph{
 
 	void setMatrix(vector<vector<bool>> matrix);
 
+	void treeDecomposition();
+	vector<Point> firstBag();
+	vector<Point> nextBag(vector<Point> bag);
+	Point lastNoWall();
+
+
 	bool isWall(unsigned x, unsigned y);
+	bool isWall(Point p);
 
 	bool isDominatedBy(vector<Point> tuple);
 
