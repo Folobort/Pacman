@@ -13,8 +13,91 @@
 
 using namespace std;
 
+#define STK_L 0
+#define STK_C 1
+#define STK_S 2
+
+
 
 Graph::Graph(){}
+
+//Label of a point
+struct label{
+	Point point;
+	unsigned sticker;
+};
+
+//Signature of a bag
+struct signature{
+	vector<label> bagLabels;
+	unsigned selectedCount;
+};
+
+int inSignature(signature sig, Point q){
+	for(unsigned i=0; i<sig.bagLabels.size(); i++){
+		if(sig.bagLabels[i].point.equals(q)){
+			return i;
+		}
+	}
+	return -1;
+}
+
+unsigned getSticker(signature sig, int i){
+	return sig.bagLabels[i].sticker;
+}
+
+unsigned getSticker(signature sig, Point p){
+	int pos = inSignature(sig, p);
+	if(pos != -1){
+		return getSticker(sig, pos);
+	} else{
+		// PROUT
+		cout << "OLALA KESKISPASS" << endl;
+		return 23;
+	}
+}
+
+vector<signature> VROUM(vector<Point> bag, vector<signature> sigSons){
+	for(unsigned i=0; i<sigSons.size(); i++){
+		walala updateSig(bag, sigSons[i]);
+	}
+}
+
+
+vector<signature> updateSig(vector<Point> bag, signature sigSon){
+	Point toCover = bag.back();
+	unsigned stk = getSticker(sigSon, toCover);
+	vector<Point> nb = neighbors[toCover.x()][toCover.y()];
+	
+	vector<signature> newSigVect = new vector<signature>(0);
+	
+	if(stk == STK_L){ /// libre: 
+		for(unsigned i=0; i<nb.size(); i++){ // select a neighbor
+			if(nb[i].isInVector(bag)){
+				signature newSig = sigSon.updateL(toCover, bag.front(), nb[i]);
+				newSigVect.push_back(newSig);
+			}
+		}
+		
+		// select point: same as (stk = selection)
+		signature newSig = sigSon.updateS(toCover, bag.first(), nb);
+		newSigVect.push_back(newSig);
+		
+		return newSigVect;
+	}
+	else if(stk == STK_C){ /// couvert: nothing to do
+		signature newSig = sigSon.updateC(toCover, bag.first());
+		newSigVect.push_back(newSig);
+
+		return newSigVect;
+	}
+	else{ // stk == STK_S, selection: count+1 and cover neighbors
+		signature newSig = sigSon.updateS(toCover, bag.first(), nb);
+		newSigVect.push_back(newSig);
+
+		return newSigVect;
+	}
+}
 
 void Graph::setMatrix(vector<vector<bool>> matrix){
 	this->matrix = matrix;
