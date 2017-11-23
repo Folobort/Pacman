@@ -12,9 +12,11 @@
 using namespace std;
 
 
-Point::Point(unsigned x, unsigned y){
+Point::Point(unsigned x, unsigned y, unsigned w, unsigned h){
 	coordX = x;
 	coordY = y;
+	width = w;
+	height = h;
 }
 
 unsigned Point::x(){
@@ -24,24 +26,24 @@ unsigned Point::y(){
 	return coordY;
 }
 
-unsigned Point::position(unsigned width){
+unsigned Point::position(){
 	return coordX*width + coordY;
 }
 
-Point Point::next(unsigned width){
+Point Point::next(){
 	if(coordX == width-1){ // right side
-		return Point(0, coordY+1);
+		return Point(0, coordY+1, width, height);
 	}
 		
-	return Point(coordX+1, coordY);
+	return Point(coordX+1, coordY, width, height);
 }
 
-Point Point::before(unsigned width){
+Point Point::before(){
 	if(coordX == 0){
-		return Point(width-1, coordY-1);
+		return Point(width-1, coordY-1, width, height);
 	}
 	
-	return Point(coordX-1, coordY);
+	return Point(coordX-1, coordY, width, height);
 }
 
 Point Point::left(){
@@ -49,39 +51,40 @@ Point Point::left(){
 		throw new exception();
 	}
 			
-	return Point(coordX-1, coordY);
+	return Point(coordX-1, coordY, width, height);
 }
-Point Point::right(unsigned width){
+Point Point::right(){
 	if(coordX == width-1){ // right side
 		throw new exception();
 	}
 		
-	return Point(coordX+1, coordY);
+	return Point(coordX+1, coordY, width, height);
 }
 Point Point::up(){
 	if(coordY == 0){ // top side
 		throw new exception();
 	}
 		
-	return Point(coordX, coordY-1);
+	return Point(coordX, coordY-1, width, height);
 }
-Point Point::down(unsigned height){
+Point Point::down(){
 	if(coordY == height-1){ // bottom side
 		throw new exception();
 	}
 		
-	return Point(coordX, coordY+1);
+	return Point(coordX, coordY+1, width, height);
 }
 
-bool Point::isLast(unsigned width, unsigned height){
+bool Point::isLast(){
 	return (coordX == width-1) && (coordY == height-1);
 }
 
 Point Point::copy(){
-	return Point(coordX, coordY);
+	return Point(coordX, coordY, width, height);
 }
 
 bool Point::equals(Point point){
+	/// we assume we work on one grid
 	return (coordX == point.x()) && (coordY == point.y());
 }
 

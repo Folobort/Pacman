@@ -16,25 +16,27 @@ class Point{
 	// DATA
 	unsigned coordX;
 	unsigned coordY;
+	unsigned width;
+	unsigned height;
 	
 	// PROTOTYPES
 	public:
-	Point(unsigned x, unsigned y);
+	Point(unsigned x, unsigned y, unsigned w, unsigned h);
 	
 	unsigned x();
 	unsigned y();
 	
-	unsigned position(unsigned width);
+	unsigned position();
 	
-	Point next(unsigned width);
-	Point before(unsigned width);
+	Point next();
+	Point before();
 	
 	Point left();
-	Point right(unsigned width);
+	Point right();
 	Point up();
-	Point down(unsigned height);
+	Point down();
 	
-	bool isLast(unsigned width, unsigned height);
+	bool isLast();
 	
 	Point copy();
 	

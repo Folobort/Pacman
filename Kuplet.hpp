@@ -17,14 +17,16 @@ using namespace std;
 class Kuplet{
 	// DATA
 	unsigned k;
+	unsigned width;
+	unsigned height;
 	
 	// PROTOTYPES
 	public:
-	Kuplet(unsigned k);
+	Kuplet(unsigned k, unsigned w, unsigned h);
 	
-	vector<Point> nextElement (vector<Point> element, unsigned width, unsigned height);
+	vector<Point> nextElement (vector<Point> element);
 	
-	vector<Point> firstElement (unsigned size, unsigned width, unsigned height);
+	vector<Point> firstElement (unsigned size);
 	
 	bool hasNoWall(vector<vector<bool>> matrix, vector<Point> element);
 

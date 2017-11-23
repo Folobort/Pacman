@@ -18,15 +18,17 @@
 
 using namespace std;
 
-Kuplet::Kuplet(unsigned k){
+Kuplet::Kuplet(unsigned k, unsigned w, unsigned h){
 	this->k = k;
+	width = w;
+	height = h;
 }
 
-vector<Point> Kuplet::nextElement (vector<Point> element, unsigned width, unsigned height){
+vector<Point> Kuplet::nextElement (vector<Point> element){
 	vector<Point> next_element;
 	
 	if(element.size() == 1){
-		next_element.push_back(element[0].next(width));
+		next_element.push_back(element[0].next());
 		return next_element;
 	}
 		
@@ -34,19 +36,19 @@ vector<Point> Kuplet::nextElement (vector<Point> element, unsigned width, unsign
 	int i = 0;
 	int s = 0; int t = 0;
 	do {
-		s = element[i].position(width);
-		t = element[++i].position(width);
+		s = element[i].position();
+		t = element[++i].position();
 	} while((t-s == 1) && (i < k-1)); /// tant que consécutif et non dernier
 		
 	if(i == k-1){ /// cas tous consécutifs
 		i = k;
-		if(element[k-1].isLast(width, height)){
+		if(element[k-1].isLast()){
 			exit(EXIT_FAILURE); // CHANGE LATER (cas fin)
 		}
 	}
 		
-	next_element = firstElement(i-1, width, height); /// "retour chariot"
-	next_element.push_back(element[i-1].next(width)); /// décalage
+	next_element = firstElement(i-1); /// "retour chariot"
+	next_element.push_back(element[i-1].next()); /// décalage
 	for (int p = i; p<k; p++){ /// copie du reste
 		next_element.push_back(element[p]);
 	}
@@ -54,17 +56,17 @@ vector<Point> Kuplet::nextElement (vector<Point> element, unsigned width, unsign
 	return next_element;
 }
 
-vector<Point> Kuplet::firstElement (unsigned size, unsigned width, unsigned height){
+vector<Point> Kuplet::firstElement (unsigned size){
 	vector<Point> first_element;	
 		
 	if(size == 0){
 		return first_element; // empty vector
 	}
 		
-	first_element.push_back(Point(0,0));
+	first_element.push_back(Point(0,0,width,height));
 		
 	for(unsigned i=0; i<size; i++){
-		first_element.push_back(first_element[i].next(width));
+		first_element.push_back(first_element[i].next());
 	}
 
 	return first_element;

@@ -10,6 +10,8 @@
 #include "Graph.hpp"
 #include "Parser.hpp"
 #include "Kuplet.hpp"
+#include "Point.hpp"
+#include "PointFactory.hpp"
 
 using namespace std;
 
@@ -24,21 +26,24 @@ void Graph::setMatrix(vector<vector<bool>> matrix){
 	for(unsigned x=0; x<matrix.size(); x++){
 		for(unsigned y=0; y<matrix[0].size(); y++){
 			if(x > 0 && !isWall(x,y)){ // If not on left edge nor wall, then notify left neighbor
-				neighbors[x-1][y].push_back(Point(x,y));
+				neighbors[x-1][y].push_back(pf.mkPoint(x,y));
 			}
 			if(x < matrix.size()-1 && !isWall(x,y)){
-				neighbors[x+1][y].push_back(Point(x,y));
+				neighbors[x+1][y].push_back(pf.mkPoint(x,y));
 			}
 			if(y < 0 && !isWall(x,y)){
-				neighbors[x][y-1].push_back(Point(x,y));
+				neighbors[x][y-1].push_back(pf.mkPoint(x,y));
 			}
 			if(y < matrix[0].size()-1 && !isWall(x,y)){
-				neighbors[x][y+1].push_back(Point(x,y));
+				neighbors[x][y+1].push_back(pf.mkPoint(x,y));
 			}
 		}
 	}
 
 	dist = vector<vector<unsigned>> (matrix.size(), vector<unsigned>(matrix[0].size(), INFINITY));
+
+	// Set PointFactory
+	pf = PointFactory(matrix.size(), matrix[0].size());
 }
 
 void Graph::treeDecomposition(){
@@ -46,35 +51,33 @@ void Graph::treeDecomposition(){
     
     //Add bag to the tree decomposition
     tree.push_back(bag);
-    cout << "First bag" << endl;
 	
     //Update bag
     Point lastValid = lastNoWall();
-    cout << "Last valid: (" << lastValid.x() << "," << lastValid.y() << ")" << endl;
-    /// (42,512)
     
     unsigned k = 0;
     while(!(bag.back().equals(lastValid))){
 		bag = nextBag(bag);
 		tree.push_back(bag);
-		
-		k++;
-		cout << "Next bag " << k << ", bag.back = (" << bag.back().x() << "," << bag.back().y() << ")" << endl;
 	}
+	
+	cout << "Created " << tree.size() << " bags!" << endl;
+	
 }
 
 vector<Point> Graph::firstBag(){
 	vector<Point> bag; //a bag contain each step of the tree decomposition starting with first line
-    Point p = Point(0,0);
+    Point p = pf.mkPoint(0,0);
     while(isWall(p)){
-		p=p.next(matrix.size());
+		p=p.next();
 	}
     bag.push_back(p); // first no-wall Point
-    while(bag.size()<matrix.size()+1){
-        p = p.next(matrix.size());
-        while(isWall(p)){
-			p=p.next(matrix.size());
-		}
+    
+    while(bag.size() < matrix.size()+1){
+        do{
+			p=p.next();
+		} while(isWall(p));
+		
         bag.push_back(p);
     }
 	
@@ -82,21 +85,19 @@ vector<Point> Graph::firstBag(){
 }
 
 vector<Point> Graph::nextBag(vector<Point> bag){
-	Point nextAdd = bag.back().next(matrix.size());
-	while(!nextAdd.isLast(matrix.size(), matrix[0].size()) && !isWall(nextAdd)){
-		nextAdd = nextAdd.next(matrix.size());
+	
+	Point nextAdd = bag.back().next();
+	
+	while(!nextAdd.isLast() && isWall(nextAdd)){
+		nextAdd = nextAdd.next();
 	}
 	
 	/* Should not be called normally
-	if(nextAdd.isLast && nextAdd.isWall){
+	if(nextAdd.isLast || nextAdd.isWall){
 		return bag;
 		// bag was last valid bag, abort somehow
 	}
 	*/
-	
-	cout << "NextAdd: (" << nextAdd.x() << "," << nextAdd.y() << ")" << endl;
-	
-	
 	
 	bag.erase(bag.begin());
 	bag.push_back(nextAdd);
@@ -107,10 +108,12 @@ vector<Point> Graph::nextBag(vector<Point> bag){
 
 
 Point Graph::lastNoWall(){
-	Point lastValid = Point(matrix.size()-1, matrix[0].size()-1);
+	/// TO DO: Last valid should exist, but write safety just in case?
+	
+	Point lastValid = pf.mkPointLast();
 	
 	while(isWall(lastValid)){
-		lastValid = lastValid.before(matrix.size());
+		lastValid = lastValid.before();
 	}
 
 	return lastValid;
@@ -181,22 +184,22 @@ unsigned Graph::makeDijkstra(vector<Point> tuple){
 		if(x > 0 && !processed[x-1][y]){ /// Process LEFT
 			processed[x-1][y] = true;
 			dist[x-1][y] = dist[x][y] + 1;
-			toProcessNow.push_back(Point(x-1, y));
+			toProcessNow.push_back(pf.mkPoint(x-1, y));
 		}
 		if(x < matrix.size()-1 && !processed[x+1][y]){ /// Process RIGHT
 			processed[x+1][y] = true;
 			dist[x+1][y] = dist[x][y] + 1;
-			toProcessNow.push_back(Point(x+1, y));
+			toProcessNow.push_back(pf.mkPoint(x+1, y));
 		}
 		if(y > 0 && !processed[x][y-1]){ /// Process UP
 			processed[x][y-1] = true;
 			dist[x][y-1] = dist[x][y] + 1;
-			toProcessNow.push_back(Point(x, y-1));
+			toProcessNow.push_back(pf.mkPoint(x, y-1));
 		}
 		if(y < matrix[0].size()-1 && !processed[x][y+1]){ /// Process DOWN
 			processed[x][y+1] = true;
 			dist[x][y+1] = dist[x][y] + 1;
-			toProcessNow.push_back(Point(x, y+1));
+			toProcessNow.push_back(pf.mkPoint(x, y+1));
 		}
 	}
 
@@ -205,11 +208,11 @@ unsigned Graph::makeDijkstra(vector<Point> tuple){
 
 unsigned Graph::bestDijkstra(unsigned k){
 
-	Kuplet kuplet = Kuplet(k);
+	Kuplet kuplet = Kuplet(k, matrix.size(), matrix[0].size());
 
-	vector<Point> tuple = kuplet.firstElement(k, matrix.size(), matrix[0].size());
+	vector<Point> tuple = kuplet.firstElement(k);
 	while(!kuplet.hasNoWall(matrix, tuple)){
-		tuple = kuplet.nextElement(tuple, matrix.size(), matrix[0].size());
+		tuple = kuplet.nextElement(tuple);
 	}
 	unsigned bestDist = makeDijkstra(tuple);;
 
@@ -224,7 +227,7 @@ unsigned Graph::bestDijkstra(unsigned k){
 			}
 		}
 
-		tuple = kuplet.nextElement(tuple,matrix.size(), matrix[0].size());
+		tuple = kuplet.nextElement(tuple);
 	}
 }
 
@@ -235,18 +238,18 @@ unsigned Graph::degreeOf(Point point){
 
 Point Graph::getSmallDegreeUndominated(vector<Point> S){
 	unsigned smallestDeg = 5;
-	Point point = Point(0,0);
+	Point point = pf.mkPoint(0,0);
 
 	for(unsigned x=0; x<matrix.size(); x++){
 		for(unsigned y=0; y<matrix[0].size(); y++){
-			if(Point(x,y).isInVector(S) || isWall(x,y)){
+			if(pf.mkPoint(x,y).isInVector(S) || isWall(x,y)){
 				continue;
 			}
 
-			unsigned deg = degreeOf(Point(x,y));
+			unsigned deg = degreeOf(pf.mkPoint(x,y));
 			if(deg < smallestDeg){
 				smallestDeg = deg;
-				point = Point(x,y);
+				point = pf.mkPoint(x,y);
 			}
 		}
 	}
