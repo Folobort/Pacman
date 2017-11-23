@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "Point.hpp"
+#include "PointFactory.hpp"
 
 using namespace std;
 
@@ -22,6 +23,7 @@ class Graph{
 	vector<vector<vector<Point>>> neighbors;
 	vector<vector<bool>> processed;
 	vector<vector<unsigned>> dist;
+	PointFactory pf = PointFactory(0,0);
 
 	//Tree decomposition
 	vector<vector<Point>> tree;
