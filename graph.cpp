@@ -12,121 +12,55 @@
 #include "Kuplet.hpp"
 #include "Point.hpp"
 #include "PointFactory.hpp"
+#include "Signature.hpp"
 
 using namespace std;
 
-#define STK_L 0
-#define STK_C 1
-#define STK_S 2
 
 
 
 Graph::Graph(){}
 
-//Label of a point
-struct label{
-	Point point;
-	unsigned sticker;
-};
 
-//Signature of a bag
-struct signature{
-	vector<label> bagLabels;
-	unsigned selectedCount;
-};
 
-int inSignature(signature sig, Point q){
-	for(unsigned i=0; i<sig.bagLabels.size(); i++){
-		if(sig.bagLabels[i].point.equals(q)){
-			return i;
-		}
-	}
-	return -1;
-}
 
-unsigned getSticker(signature sig, int i){
-	return sig.bagLabels[i].sticker;
-}
-
-unsigned getSticker(signature sig, Point p){
-	int pos = inSignature(sig, p);
-	if(pos != -1){
-		return getSticker(sig, pos);
-	} else{
-		// PROUT
-		cout << "OLALA KESKISPASS" << endl;
-		return 23;
-	}
-}
-
+/*
 vector<signature> VROUM(vector<Point> bag, vector<signature> sigSons){
 	for(unsigned i=0; i<sigSons.size(); i++){
 		walala updateSig(bag, sigSons[i]);
 	}
 }
+*/
 
-
-vector<signature> updateSig(vector<Point> bag, signature sigSon){
-	Point toCover = bag.back();
-	unsigned stk = getSticker(sigSon, toCover);
-	vector<Point> nb = neighbors[toCover.x()][toCover.y()];
-	
-	vector<signature> newSigVect = new vector<signature>(0);
-	
-	if(stk == STK_L){ /// libre: 
-		for(unsigned i=0; i<nb.size(); i++){ // select a neighbor
-			if(nb[i].isInVector(bag)){
-				signature newSig = sigSon.updateL(toCover, bag.front(), nb[i]);
-				newSigVect.push_back(newSig);
-			}
-		}
-		
-		// select point: same as (stk = selection)
-		signature newSig = sigSon.updateS(toCover, bag.first(), nb);
-		newSigVect.push_back(newSig);
-		
-		return newSigVect;
-	}
-	else if(stk == STK_C){ /// couvert: nothing to do
-		signature newSig = sigSon.updateC(toCover, bag.first());
-		newSigVect.push_back(newSig);
-
-		return newSigVect;
-	}
-	else{ // stk == STK_S, selection: count+1 and cover neighbors
-		signature newSig = sigSon.updateS(toCover, bag.first(), nb);
-		newSigVect.push_back(newSig);
-
-		return newSigVect;
-	}
-}
 
 void Graph::setMatrix(vector<vector<bool>> matrix){
 	this->matrix = matrix;
+	
+	// Set PointFactory
+	pf = PointFactory(matrix);
 
 	neighbors = vector<vector<vector<Point>>> (matrix.size(), vector<vector<Point>> (matrix[0].size()));
 
 	for(unsigned x=0; x<matrix.size(); x++){
 		for(unsigned y=0; y<matrix[0].size(); y++){
-			if(x > 0 && !isWall(x,y)){ // If not on left edge nor wall, then notify left neighbor
-				neighbors[x-1][y].push_back(pf.mkPoint(x,y));
-			}
-			if(x < matrix.size()-1 && !isWall(x,y)){
-				neighbors[x+1][y].push_back(pf.mkPoint(x,y));
-			}
-			if(y < 0 && !isWall(x,y)){
-				neighbors[x][y-1].push_back(pf.mkPoint(x,y));
-			}
-			if(y < matrix[0].size()-1 && !isWall(x,y)){
-				neighbors[x][y+1].push_back(pf.mkPoint(x,y));
+			if(!isWall(x,y)){
+				if(x > 0){ // If not on left edge nor wall, then notify left neighbor
+					neighbors[x-1][y].push_back(pf.mkPoint(x,y));
+				}
+				if(x < matrix.size()-1){
+					neighbors[x+1][y].push_back(pf.mkPoint(x,y));
+				}
+				if(y > 0){
+					neighbors[x][y-1].push_back(pf.mkPoint(x,y));
+				}
+				if(y < matrix[0].size()-1){
+					neighbors[x][y+1].push_back(pf.mkPoint(x,y));
+				}
 			}
 		}
 	}
 
 	dist = vector<vector<unsigned>> (matrix.size(), vector<unsigned>(matrix[0].size(), INFINITY));
-
-	// Set PointFactory
-	pf = PointFactory(matrix.size(), matrix[0].size());
 }
 
 void Graph::treeDecomposition(){
@@ -399,6 +333,88 @@ vector<Point> Graph::k_dominant(unsigned k, vector<Point> S){
 }
 
 
+string Graph::toString(){
+	stringstream ss;
+	unsigned w = matrix.size();
+	unsigned h = matrix[0].size();
+	
+	ss << "graph G {" << endl;
+	
+	// Force all positions
+	for(unsigned y=0; y<h; y++){
+		for(unsigned x=0; x<w; x++){
+			if(matrix[x][y]){ // Not a wall
+				unsigned pos1 = y*w + x;
+				ss << pos1 << "[pos = \"" << x << "," << (h-1)-y << "!\"]" << ";" << endl;
+			}
+		}
+	}
+	
+	// Add edges
+	for(unsigned y=0; y<h; y++){
+		for(unsigned x=0; x<w; x++){
+			if(matrix[x][y]){ // Not a wall
+				unsigned pos1 = y*w + x;
+				for(unsigned i=0; i<neighbors[x][y].size(); i++){
+					unsigned pos2 = neighbors[x][y][i].y() * w + neighbors[x][y][i].x();
+					if(pos1 < pos2){
+						ss << pos1 << "--" << pos2 << ";" << endl;
+					}
+				}
+			}
+		}
+	}
+	
+	ss << "}";
+	
+	return ss.str();
+}
+
+/*
+vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficient first draft
+	vector<Signature> cleanedSigs;
+	vector<bool> keepIndex(true, sigs.size());
+	
+	for(unsigned i=0; i<sigs.size(); i++){
+		if(keepIndex[i]){
+			for(unsigned j=i+1; j<sigs.size(); j++){
+				if(keepIndex[j] && sigs[i].equals(sigs[j])){ // same apparent signature
+					if(sigs[i].selected.size() <= sigs[j].selected.size()){
+						keepIndex[j] = false;
+					}else{
+						keepIndex[i] = false;
+					}
+				}
+			}
+		}
+	}
+	
+	for(unsigned i=0; i<sigs.size(); i++){
+		if(keepIndex[i]){
+			cleanedSig.push_back(sigs[i]);
+		}
+	}
+	
+	return cleanedSigs;
+}
+
+vector<Signature> Graph::nextSigSet(Point newPoint){
+	vector<Signature> nextSigs;
+	
+	for(unsigned i=0; i<sigSet.size(); i++){
+		vector<Signature> sigSetElem = sigSet[i].update(newPoint);
+		for(unsigned k=0; k<sigSetElem.size(); k++){
+			nextSigs.push_back(sigSetElem[k]);
+		}
+	}
+	
+	return cleanMultipleSig(nextSigs);
+}
+*/
+
+
+
+
 
 
 
@@ -407,7 +423,8 @@ int main(){
 
 
 	Parser p;
-	vector<vector<bool>> matrix = p.parse("lol_map_ascii.pbm");
+	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_nano.pbm");
+	
 	//p.showMatrix(matrix);
 
 	Graph g = Graph();
@@ -433,8 +450,9 @@ int main(){
 	}
 */
 
-	g.treeDecomposition();
+	///g.treeDecomposition();
 
+	cout << g.toString() << endl;
 
 
 	return 0;

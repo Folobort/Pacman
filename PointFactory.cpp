@@ -13,16 +13,20 @@
 using namespace std;
 
 
-PointFactory::PointFactory(unsigned w, unsigned h){
-	width = w;
-	height = h;
+PointFactory::PointFactory(vector<vector<bool>> m){
+	matrix = m;
 }
 
 Point PointFactory::mkPoint(unsigned x, unsigned y){
-	return Point(x, y, width, height);
+	unsigned w = matrix.size();
+	unsigned h = matrix[0].size();
+	
+	return Point(x, y, w, h);
 }
 
 Point PointFactory::mkPointLast(){
-	return Point(width-1, height-1, width, height);
+	unsigned w = matrix.size();
+	unsigned h = matrix[0].size();
+	return mkPoint(w-1, h-1);
 }
 

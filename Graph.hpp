@@ -23,10 +23,11 @@ class Graph{
 	vector<vector<vector<Point>>> neighbors;
 	vector<vector<bool>> processed;
 	vector<vector<unsigned>> dist;
-	PointFactory pf = PointFactory(0,0);
+	PointFactory pf = PointFactory(vector<vector<bool>>());
 
 	//Tree decomposition
 	vector<vector<Point>> tree;
+	///vector<Signature> sigSet;
 	unsigned INFINITY;
 
 	// PROTOTYPES
@@ -57,6 +58,10 @@ class Graph{
 	vector<Point> getNeighborsUndominating(Point point, vector<Point> S);
 
 	vector<Point> k_dominant(unsigned k, vector<Point> S);
+	
+	string toString();
+	
+	
 };
 
 

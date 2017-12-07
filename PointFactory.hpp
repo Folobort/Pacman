@@ -16,12 +16,11 @@ using namespace std;
 
 class PointFactory{
 	// DATA
-	unsigned width;
-	unsigned height;
+	vector<vector<bool>> matrix; // false for wall
 	
 	// PROTOTYPES
 	public:
-	PointFactory(unsigned w, unsigned h);
+	PointFactory(vector<vector<bool>> m);
 	
 	Point mkPoint(unsigned x, unsigned y);
 	
