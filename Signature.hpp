@@ -52,13 +52,23 @@ class Signature{
 	
 	// COMPARATORS
 	bool equals(Signature sig);
+	bool isBetterFinalSig(Signature sig);
 	
 	// OTHERS
 	vector<Signature> update(Point newPoint, vector<vector<vector<Point>>> neighbors);
-	
 	Signature updateF(Point newPoint, Point selected, vector<vector<vector<Point>>> neighbors);
 	Signature updateS(Point newPoint, vector<vector<vector<Point>>> neighbors);
 	Signature updateC(Point newPoint, vector<vector<vector<Point>>> neighbors);
+
+
+	vector<Signature> update(vector<vector<vector<Point>>> neighbors);
+	Signature updateF(Point selected, vector<vector<vector<Point>>> neighbors);
+	Signature updateS(vector<vector<vector<Point>>> neighbors);
+	Signature updateC(vector<vector<vector<Point>>> neighbors);
+	
+	// TO STRING
+	string toString();
+
 };
 
 

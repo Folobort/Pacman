@@ -51,10 +51,8 @@ Signature Signature::updateBagWith(Point newPoint){
 
 Signature Signature::removeLastFromBag(){
 	Signature newSig = copy();
+	Point lastP = bag[bag.size()-1];
 	
-	if(stickers[stickers.size()-1] == STK_S){
-		newSig.selected.push_back(bag[bag.size()-1]);
-	}
 	bag.pop_back();
 	stickers.pop_back();
 	
@@ -102,9 +100,7 @@ void Signature::setSticker(Point p, unsigned stk){
 	
 	if(index != -1){
 		stickers[index] = stk;
-	} else{
-		cout << "OLALA KESKISPASS SIGNATURE::SETSTICKER" << endl;
-	}
+	}/// In fact, the else case happens and does not matter
 }
 
 void Signature::select(Point p){
@@ -115,6 +111,10 @@ void Signature::select(Point p){
 // COMPARATORS
 bool Signature::equals(Signature sig){ // only with same bags (ie, same node of the tree dec)
 	return equal(stickers.begin(), stickers.end(), sig.stickers.begin());
+}
+
+bool Signature::isBetterFinalSig(Signature sig){
+	return (getSelected().size() <= sig.getSelected().size());
 }
 
 
@@ -141,8 +141,12 @@ vector<Signature> Signature::update(Point newPoint, vector<vector<vector<Point>>
 		newSig = updateS(newPoint, neighbors);
 		newSigs.push_back(newSig);
 	}
-	else if(stk == STK_C){ /// Covered: nothing to do
+	else if(stk == STK_C){ /// Covered: nothing to do, or select it
+		// Case do nothing
 		newSig = updateC(newPoint, neighbors);
+		newSigs.push_back(newSig);
+		// Case select
+		newSig = updateS(newPoint, neighbors);
 		newSigs.push_back(newSig);
 	}
 	else{ /// stk == STK_S, Selected: count+1 and set neighbors to covered
@@ -150,11 +154,87 @@ vector<Signature> Signature::update(Point newPoint, vector<vector<vector<Point>>
 		newSigs.push_back(newSig);
 	}
 	
+	
+	for(unsigned i=0; i<newSigs.size(); i++){
+		newSigs[i].toString();
+	}
+	
 	return newSigs;
 }
 
 Signature Signature::updateF(Point newPoint, Point selected, vector<vector<vector<Point>>> neighbors){
 	Signature newSig = updateBagWith(newPoint);
+	
+	// set the point to selected
+	newSig.setSticker(selected, STK_S);
+	
+	// each neighbor which is not covered (STK_F) becomes covered (STK_C)
+	vector<Point> nb = neighbors[selected.x()][selected.y()];
+	for(unsigned i=0; i<nb.size(); i++){
+		int index = newSig.getIndex(nb[i]); /// (index = -1) in case of not in sig
+		if(index != -1 && newSig.stickers[index] == STK_F){ // a non-covered neighbor
+			newSig.stickers[index] = STK_C;
+		}
+	}
+	
+	return newSig;
+}
+
+Signature Signature::updateS(Point newPoint, vector<vector<vector<Point>>> neighbors){
+	Point selected = bag.back();
+	Signature newSig = updateF(newPoint, selected, neighbors);
+	newSig.select(selected);
+	
+	return newSig;
+}
+
+Signature Signature::updateC(Point newPoint, vector<vector<vector<Point>>> neighbors){
+	Signature newSig = updateBagWith(newPoint);
+	
+	return newSig;
+}
+
+
+
+vector<Signature> Signature::update(vector<vector<vector<Point>>> neighbors){
+	vector<Signature> newSigs;
+	Signature newSig;
+
+	// We take the point to be removed next, and its neighbors in the graph.
+	Point toCover = bag.back();
+	unsigned stk = getSticker(toCover);
+	vector<Point> nb = neighbors[toCover.x()][toCover.y()];
+	
+	if(stk == STK_F){ /// Free (not covered): we need to select this point or a neighbor (so deg+1 new signatures)
+		for(unsigned i=0; i<nb.size(); i++){ // select a neighbor
+			if(nb[i].isInVector(bag)){
+				newSig = updateF(nb[i], neighbors);
+				newSigs.push_back(newSig);
+			}
+		}
+		
+		// select point: same as (stk = STK_S)
+		newSig = updateS(neighbors);
+		newSigs.push_back(newSig);
+	}
+	else if(stk == STK_C){ /// Covered: nothing to do, or select it
+		// Case do nothing
+		newSig = updateC(neighbors);
+		newSigs.push_back(newSig);
+		// Case select
+		newSig = updateS(neighbors);
+		newSigs.push_back(newSig);
+	}
+	else{ /// stk == STK_S, Selected: count+1 and set neighbors to covered
+		newSig = updateS(neighbors);
+		newSigs.push_back(newSig);
+	}
+	
+	return newSigs;
+}
+
+Signature Signature::updateF(Point selected, vector<vector<vector<Point>>> neighbors){
+	Signature newSig = copy().removeLastFromBag();
 	
 	// set the point to selected
 	newSig.setSticker(selected, STK_S);
@@ -171,21 +251,35 @@ Signature Signature::updateF(Point newPoint, Point selected, vector<vector<vecto
 	return newSig;
 }
 
-Signature Signature::updateS(Point newPoint, vector<vector<vector<Point>>> neighbors){
-	// This case (last point of the bag with an STK_S) is equivalent to finding this point with STK_F and setting it to selected now.
-	// Moreover, it helps making sure all its neighbors are set to STK_C. (which might not be the case of the higher/lefter ones)
+
+
+Signature Signature::updateS(vector<vector<vector<Point>>> neighbors){
 	Point selected = bag.back();
-	Signature newSig = updateF(newPoint, selected, neighbors);
+	Signature newSig = updateF(selected, neighbors);
+	newSig.select(selected);
 	
 	return newSig;
 }
 
-Signature Signature::updateC(Point newPoint, vector<vector<vector<Point>>> neighbors){
-	// Nothing to do in this case but update the bag
-	Signature newSig = updateBagWith(newPoint);
+Signature Signature::updateC(vector<vector<vector<Point>>> neighbors){
+	Signature newSig = copy().removeLastFromBag();
 	
 	return newSig;
 }
+
+
+string Signature::toString(){
+	cout << "=====" << endl;
+	cout << "Sig :" << endl;
+	for(unsigned i=0; i<bag.size(); i++){
+		cout << bag[i].toString() << " " << stickers[i] << endl;
+	}
+	cout << "selected :" << endl;
+	for(unsigned i=0; i<selected.size(); i++){
+		cout << selected[i].toString() << endl;
+	}
+}
+
 
 
 

@@ -38,6 +38,7 @@ class Graph{
 	Graph();
 	void setMatrix(vector<vector<bool>> matrix);
 
+
 	void treeDecomposition();
 	vector<Point> firstBag();
 	vector<Point> nextBag(vector<Point> bag);
@@ -65,6 +66,14 @@ class Graph{
 	
 	vector<Signature> cleanMultipleSig(vector<Signature> sigs);
 	vector<Signature> nextSigSet(Point newPoint);
+	vector<Signature> nextSigSet();
+	
+	void firstSigSet();
+	
+	void wololoLoop();
+	
+	Point diff(vector<Point> vp1, vector<Point> vp2);
+	
 };
 
 

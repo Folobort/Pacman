@@ -411,10 +411,70 @@ vector<Signature> Graph::nextSigSet(Point newPoint){
 	return cleanMultipleSig(nextSigs);
 }
 
+vector<Signature> Graph::nextSigSet(){
+	vector<Signature> nextSigs;
+	
+	for(unsigned i=0; i<sigSet.size(); i++){
+		vector<Signature> sigSetElem = sigSet[i].update(neighbors);
+		for(unsigned k=0; k<sigSetElem.size(); k++){
+			nextSigs.push_back(sigSetElem[k]);
+		}
+	}
+	
+	return cleanMultipleSig(nextSigs);
+}
 
 
 
+void Graph::wololoLoop(){
+	firstSigSet();
 
+	for(unsigned i=/*tree.size()-1*/3; i>0; i--){
+		Point newPoint = diff(tree[i],tree[i-1]); // TO DO, returns the element of tree[i-1] that is not is tree[i]
+	
+		sigSet = nextSigSet(newPoint);
+	}
+	
+	cout << "TREE[0].SIZE() = " << tree[0].size() << endl;
+	
+	for(unsigned i=0; i<tree[0].size(); i++){
+		sigSet = nextSigSet();
+	}
+	
+	Signature finalSig = sigSet[0];
+	for(unsigned i=1; i<sigSet.size(); i++){
+		if(sigSet[i].isBetterFinalSig(finalSig)){
+			finalSig = sigSet[i];
+		}
+	}
+	
+	vector<Point> finalSet = finalSig.getSelected();
+	
+	cout << "FINAL SET (size " << finalSet.size() << ") :" << endl;
+	for(unsigned i=0; i<finalSet.size(); i++){
+		cout << finalSet[i].toString() << endl;
+	}
+}
+
+
+void Graph::firstSigSet(){
+	vector<Point> firstBag = tree[/*tree.size()-1*/3-1];
+	
+	Signature newSig = Signature(firstBag);
+	sigSet.push_back(newSig);
+}
+
+
+Point Graph::diff(vector<Point> vp1, vector<Point> vp2){ // vp1 and vp2 must be of same size, and not equals
+	for(unsigned i=0; i<vp1.size(); i++){
+		if(!vp1[i].isInVector(vp2)){
+			return vp1[i];
+		}
+	}
+	
+	cout << "ERR DIFF PLZ STAHP" << endl; /// balancer une exception dans le cas d'égalité
+	return pf.mkPoint(0,0);
+}
 
 
 
@@ -451,6 +511,7 @@ int main(){
 */
 
 	g.treeDecomposition();
+	g.wololoLoop();
 	
 
 	//cout << g.toString() << endl;
