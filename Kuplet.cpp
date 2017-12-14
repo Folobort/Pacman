@@ -1,10 +1,3 @@
-/*
- * kuplet.cpp
- *
- *  Created on: 24 sept. 2017
- *      Author: louis
- */
-
 #include <fstream>
 #include <iostream>
 #include <queue>
@@ -18,10 +11,29 @@
 
 using namespace std;
 
+// CONSTRUCTOR
 Kuplet::Kuplet(unsigned k, unsigned w, unsigned h){
 	this->k = k;
 	width = w;
 	height = h;
+}
+
+
+// BAG CONSTRUCTORS
+vector<Point> Kuplet::firstElement (unsigned size){
+	vector<Point> first_element;	
+		
+	if(size == 0){
+		return first_element; // empty vector
+	}
+		
+	first_element.push_back(Point(0,0,width,height));
+		
+	for(unsigned i=0; i<size; i++){
+		first_element.push_back(first_element[i].next());
+	}
+
+	return first_element;
 }
 
 vector<Point> Kuplet::nextElement (vector<Point> element){
@@ -56,22 +68,8 @@ vector<Point> Kuplet::nextElement (vector<Point> element){
 	return next_element;
 }
 
-vector<Point> Kuplet::firstElement (unsigned size){
-	vector<Point> first_element;	
-		
-	if(size == 0){
-		return first_element; // empty vector
-	}
-		
-	first_element.push_back(Point(0,0,width,height));
-		
-	for(unsigned i=0; i<size; i++){
-		first_element.push_back(first_element[i].next());
-	}
+// OTHERS
 
-	return first_element;
-}
-	
 bool Kuplet::hasNoWall(vector<vector<bool>> matrix, vector<Point> element){
 	for(unsigned i=0; i<element.size(); i++){
 		if(matrix[element[i].x()][element[i].y()] == false){

@@ -15,21 +15,24 @@ using namespace std;
 #include "Point.hpp"
 
 class Kuplet{
-	// DATA
+	// == DATA ==
 	unsigned k;
+	
 	unsigned width;
 	unsigned height;
 	
-	// PROTOTYPES
+	// == PROTOTYPES ==
 	public:
+	
+	// CONSTRUCTOR
 	Kuplet(unsigned k, unsigned w, unsigned h);
 	
+	// BAG CONSTRUCTORS
+	vector<Point> firstElement (unsigned size);			/// Bag of defined size, with point of least position values (ie, top-leftest bag)
 	vector<Point> nextElement (vector<Point> element);
 	
-	vector<Point> firstElement (unsigned size);
-	
+	// OTHERS
 	bool hasNoWall(vector<vector<bool>> matrix, vector<Point> element);
-
 	bool isInMatrix(vector<vector<bool>> matrix, vector<Point> element);
 
 };

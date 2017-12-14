@@ -370,7 +370,7 @@ string Graph::toString(){
 	return ss.str();
 }
 
-/*
+
 vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficient first draft
 	vector<Signature> cleanedSigs;
 	vector<bool> keepIndex(true, sigs.size());
@@ -379,7 +379,7 @@ vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficien
 		if(keepIndex[i]){
 			for(unsigned j=i+1; j<sigs.size(); j++){
 				if(keepIndex[j] && sigs[i].equals(sigs[j])){ // same apparent signature
-					if(sigs[i].selected.size() <= sigs[j].selected.size()){
+					if(sigs[i].getSelected().size() <= sigs[j].getSelected().size()){
 						keepIndex[j] = false;
 					}else{
 						keepIndex[i] = false;
@@ -391,7 +391,7 @@ vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficien
 	
 	for(unsigned i=0; i<sigs.size(); i++){
 		if(keepIndex[i]){
-			cleanedSig.push_back(sigs[i]);
+			cleanedSigs.push_back(sigs[i]);
 		}
 	}
 	
@@ -402,7 +402,7 @@ vector<Signature> Graph::nextSigSet(Point newPoint){
 	vector<Signature> nextSigs;
 	
 	for(unsigned i=0; i<sigSet.size(); i++){
-		vector<Signature> sigSetElem = sigSet[i].update(newPoint);
+		vector<Signature> sigSetElem = sigSet[i].update(newPoint, neighbors);
 		for(unsigned k=0; k<sigSetElem.size(); k++){
 			nextSigs.push_back(sigSetElem[k]);
 		}
@@ -410,7 +410,7 @@ vector<Signature> Graph::nextSigSet(Point newPoint){
 	
 	return cleanMultipleSig(nextSigs);
 }
-*/
+
 
 
 
@@ -450,9 +450,10 @@ int main(){
 	}
 */
 
-	///g.treeDecomposition();
+	g.treeDecomposition();
+	
 
-	cout << g.toString() << endl;
+	//cout << g.toString() << endl;
 
 
 	return 0;

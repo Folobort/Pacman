@@ -12,13 +12,14 @@
 
 #include "Point.hpp"
 #include "PointFactory.hpp"
+#include "Signature.hpp"
 
 using namespace std;
 
 const unsigned INFINITY = -1;
 
 class Graph{
-	// DATA
+	// == DATA ==
 	vector<vector<bool>> matrix; // False for wall
 	vector<vector<vector<Point>>> neighbors;
 	vector<vector<bool>> processed;
@@ -27,13 +28,14 @@ class Graph{
 
 	//Tree decomposition
 	vector<vector<Point>> tree;
-	///vector<Signature> sigSet;
+	vector<Signature> sigSet;
 	unsigned INFINITY;
 
-	// PROTOTYPES
+	// == PROTOTYPES ==
 	public:
+	
+	// CONSTRUCTORS
 	Graph();
-
 	void setMatrix(vector<vector<bool>> matrix);
 
 	void treeDecomposition();
@@ -48,7 +50,6 @@ class Graph{
 	bool isDominatedBy(vector<Point> tuple);
 
 	unsigned makeDijkstra(vector<Point> tuple);
-
 	unsigned bestDijkstra(unsigned k);
 
 	unsigned degreeOf(Point point);
@@ -62,6 +63,8 @@ class Graph{
 	string toString();
 	
 	
+	vector<Signature> cleanMultipleSig(vector<Signature> sigs);
+	vector<Signature> nextSigSet(Point newPoint);
 };
 
 

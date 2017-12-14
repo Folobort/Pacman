@@ -11,23 +11,15 @@
 
 using namespace std;
 
-
+// CONSTRUCTORS
 Point::Point(unsigned x, unsigned y, unsigned w, unsigned h){
 	coordX = x;
 	coordY = y;
 	width = w;
 	height = h;
 }
-
-unsigned Point::x(){
-	return coordX;
-}
-unsigned Point::y(){
-	return coordY;
-}
-
-unsigned Point::position(){
-	return coordX*width + coordY;
+Point Point::copy(){
+	return Point(coordX, coordY, width, height);
 }
 
 Point Point::next(){
@@ -37,7 +29,6 @@ Point Point::next(){
 		
 	return Point(coordX+1, coordY, width, height);
 }
-
 Point Point::before(){
 	if(coordX == 0){
 		return Point(width-1, coordY-1, width, height);
@@ -57,7 +48,7 @@ Point Point::right(){
 	if(coordX == width-1){ // right side
 		throw new exception();
 	}
-		
+	
 	return Point(coordX+1, coordY, width, height);
 }
 Point Point::up(){
@@ -75,19 +66,27 @@ Point Point::down(){
 	return Point(coordX, coordY+1, width, height);
 }
 
-bool Point::isLast(){
-	return (coordX == width-1) && (coordY == height-1);
+// GETTERS
+unsigned Point::x(){
+	return coordX;
+}
+unsigned Point::y(){
+	return coordY;
 }
 
-Point Point::copy(){
-	return Point(coordX, coordY, width, height);
+unsigned Point::position(){
+	return coordX*width + coordY;
+}
+
+// OTHERS
+bool Point::isLast(){
+	return (coordX == width-1) && (coordY == height-1);
 }
 
 bool Point::equals(Point point){
 	/// we assume we work on one grid
 	return (coordX == point.x()) && (coordY == point.y());
 }
-
 
 bool Point::isInVector(vector<Point> S){
 	for(unsigned i=0; i<S.size(); i++){
@@ -99,6 +98,7 @@ bool Point::isInVector(vector<Point> S){
 	return false;
 }
 
+// TO STRING
 string Point::toString(){
 	stringstream ss;
 	ss << "(" << x() << "," << y() << ")";

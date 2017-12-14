@@ -15,15 +15,17 @@
 using namespace std;
 
 class PointFactory{
-	// DATA
+	// == DATA ==
 	vector<vector<bool>> matrix; // false for wall
 	
-	// PROTOTYPES
+	// == PROTOTYPES ==
 	public:
+	
+	// CONSTRUCTOR
 	PointFactory(vector<vector<bool>> m);
 	
+	// POINT CONSTRUCTORS
 	Point mkPoint(unsigned x, unsigned y);
-	
 	Point mkPointLast();
 };
 
