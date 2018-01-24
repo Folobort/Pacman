@@ -78,7 +78,7 @@ void Graph::treeDecomposition(){
 		tree.push_back(bag);
 	}
 	
-	cout << "Created " << tree.size() << " bags!" << endl;
+	//cout << "Created " << tree.size() << " bags!" << endl;
 	
 }
 
@@ -345,7 +345,14 @@ string Graph::toString(){
 		for(unsigned x=0; x<w; x++){
 			if(matrix[x][y]){ // Not a wall
 				unsigned pos1 = y*w + x;
-				ss << pos1 << "[pos = \"" << x << "," << (h-1)-y << "!\"]" << ";" << endl;
+				string shapeStr;
+				if(pf.mkPoint(x,y).isInVector(bestSelectedSet)){
+					shapeStr = "shape = box";
+				} else{
+					shapeStr = "shape = circle";
+				}
+				
+				ss << pos1 << "[pos = \"" << x << "," << (h-1)-y << "!\" " << shapeStr << "]" << ";" << endl;
 			}
 		}
 	}
@@ -395,6 +402,8 @@ vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficien
 		}
 	}
 	
+	//cout << "CLEANED!" << endl;
+	
 	return cleanedSigs;
 }
 
@@ -426,19 +435,47 @@ vector<Signature> Graph::nextSigSet(){
 
 
 
-void Graph::wololoLoop(){
+void Graph::mainLoop(){
 	firstSigSet();
 
-	for(unsigned i=/*tree.size()-1*/3; i>0; i--){
+	for(unsigned i=tree.size()-1; i>0; i--){ 
 		Point newPoint = diff(tree[i],tree[i-1]); // TO DO, returns the element of tree[i-1] that is not is tree[i]
 	
 		sigSet = nextSigSet(newPoint);
 	}
 	
-	cout << "TREE[0].SIZE() = " << tree[0].size() << endl;
+	
+	//cout << "SIGNATURES COUNT : " << sigSet.size() << endl;
+	//cout << "TREE[0].SIZE() = " << tree[0].size() << endl;
+	/*
+	for(unsigned i=0; i<sigSet.size(); i++){
+		cout << "size of selected #" << i << " : " << sigSet[i].getSelected().size() << endl;
+	
+		cout << "============" << endl;
+		if(sigSet[i].getSelected().size() == 0){
+			cout << sigSet[i].toString() << endl;
+		}
+		cout << "============" << endl;
+	}
+	*/
+	
 	
 	for(unsigned i=0; i<tree[0].size(); i++){
 		sigSet = nextSigSet();
+		/*
+		cout << "=================" << endl;
+		cout << "SIGNATURES COUNT " << i << " : " << sigSet.size() << endl;
+		
+		for(unsigned i=0; i<sigSet.size(); i++){
+			cout << "size of selected #" << i << " : " << sigSet[i].getSelected().size() << endl;
+		
+			cout << "============" << endl;
+			if(sigSet[i].getSelected().size() == 0){
+				cout << sigSet[i].toString() << endl;
+			}
+			cout << "============" << endl;
+		}
+		*/
 	}
 	
 	Signature finalSig = sigSet[0];
@@ -450,25 +487,32 @@ void Graph::wololoLoop(){
 	
 	vector<Point> finalSet = finalSig.getSelected();
 	
+	/*
 	cout << "FINAL SET (size " << finalSet.size() << ") :" << endl;
 	for(unsigned i=0; i<finalSet.size(); i++){
 		cout << finalSet[i].toString() << endl;
+	}
+	*/
+	
+	
+	for(unsigned i=0; i<finalSet.size(); i++){
+		bestSelectedSet.push_back(finalSet[i]);
 	}
 }
 
 
 void Graph::firstSigSet(){
-	vector<Point> firstBag = tree[/*tree.size()-1*/3-1];
+	vector<Point> firstBag = tree[tree.size()-1];
 	
 	Signature newSig = Signature(firstBag);
 	sigSet.push_back(newSig);
 }
 
 
-Point Graph::diff(vector<Point> vp1, vector<Point> vp2){ // vp1 and vp2 must be of same size, and not equals
-	for(unsigned i=0; i<vp1.size(); i++){
-		if(!vp1[i].isInVector(vp2)){
-			return vp1[i];
+Point Graph::diff(vector<Point> vpI, vector<Point> vpIMinusOne){ // vp1 and vp2 must be of same size, and not equals
+	for(unsigned i=0; i<vpIMinusOne.size(); i++){
+		if(!vpIMinusOne[i].isInVector(vpI)){
+			return vpIMinusOne[i];
 		}
 	}
 	
@@ -511,10 +555,10 @@ int main(){
 */
 
 	g.treeDecomposition();
-	g.wololoLoop();
+	g.mainLoop();
 	
 
-	//cout << g.toString() << endl;
+	cout << g.toString() << endl;
 
 
 	return 0;

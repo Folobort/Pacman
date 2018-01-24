@@ -7,22 +7,63 @@
 #include <map>
 #include <algorithm>
 
-#include "ClassicGraph.h"
+#include "ClassicGraph.hpp"
+#include "ClassicKuplet.hpp"
 #include "Graph.hpp"
 #include "Parser.hpp"
 #include "Signature.hpp"
 
 using namespace std;
 
-//ctor
+// CONSTRUCTORS
+/// TO DO!!!
+ClassicGraph::ClassicGraph(vector<Node> graph){
+	this->graph = graph;
+	dist = vector<unsigned> (graph.size(), 0);
+}
+
+/* OLD ctor (24/01 morning)
 ClassicGraph::ClassicGraph(vector<vector<unsigned>> adj){
     this->adjacency=adj;
 }
+*/
 
 
 //============== Tree decomposition==================================
 //Creates a rooted tree decomposition
 
+/// OK, TO COMPILE
+void ClassicGraph::treeDecomposition(){
+	GraphAux gAux = GraphAux(graph); /// Copy of the node structure ("newAdj")
+		
+	while(gAux.hasNodes()){ /// "adjList not empty"
+		// Case gAux is complete
+		if(gAux.isComplete()){
+			Bag bag = Bag(graph[0].getNeighborsID());
+			bag.add(graph[0].getID());
+			treeDec.addBag(bag);
+			
+			gAux = GraphAux(); // Quickly empties the graph
+			
+			continue;
+		}
+		
+		// Normal case
+		
+		// Get one of the best nodes
+		Node u = gAux.getNodeDegmin();
+			
+		// Add new bag to the tree
+		Bag bag = Bag(u.getNeighborsID());
+		bag.add(u.getID());
+		treeDec.addBag(bag);
+			
+		// Remove the node and clickify the neighbors
+		gAux.removeAndLink(u);
+	}
+}
+
+/* OLD TreeDecomposition & co (24/01 morning)
 void ClassicGraph::treeDecomposition(){
     vector<vector<unsigned>> adjList = adjacency;
     vector<vector<unsigned>> newadjList;
@@ -45,6 +86,7 @@ void ClassicGraph::treeDecomposition(){
         tree.push_back(bag);
     }while(!adjList.empty());
 }
+
 
 //Find son in tree
 //If new bag is father's of an already existing bag then :
@@ -100,8 +142,13 @@ vector<unsigned> ClassicGraph::addNewNeighbors(vector<unsigned> neighbors, vecto
     }
     return newNeighbors;
 }
+*/
+
+
+
 
 //===================Brute force===========================================================
+/* OLD 24/01 morning
 vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
 	if(S.size() == k){
 		if(isDominating(S)){
@@ -133,9 +180,75 @@ vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
 	vector<unsigned> emptyV;
 	return emptyV; /// All sub-S failed
 }
+* */
+
+/// OK, TO COMPILE
+vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
+	// Case size == k
+	if(S.size() == k){
+		if(isDominating(S)){
+			return S;
+		}
+		vector<unsigned> emptyV;
+		return emptyV; /// Empty vector on failure
+	}
+
+	// Case size < k
+	unsigned v = undominatedDegreeMin(S);
+	
+	unsigned errorCode = 0;
+	errorCode--;
+	if(v == errorCode){ // All nodes are dominated by a set smaller than k
+		return S;
+	}
+	
+	// Normal case
+	vector<unsigned> undominatedNeighbors = getNodeWithID(v).getNeighborsID();
+	
+	// clean set of actually dominated nodes
+	vector<unsigned>::iterator it = undominatedNeighbors.end()-1;
+	while(it != undominatedNeighbors.begin()){
+		if(isDominated(S, *it)){
+			undominatedNeighbors.erase(it);
+		}
+		it--;
+	}
+	if(isDominated(S, *it)){
+		undominatedNeighbors.erase(it);
+	}
+
+	for(unsigned i=0; i<undominatedNeighbors.size(); i++){
+		vector<unsigned> S2 = S;
+		S2.push_back(undominatedNeighbors[i]);
+
+		if(k_dominant(k, S2).size() != 0){ // Not a fail, so bring it back up
+			return S2;
+		}
+	}
+
+	vector<unsigned> emptyV;
+	return emptyV; // All sub-S failed
+}
+
+/* OLD 24/01 morning
+unsigned ClassicGraph::undominatedDegreeMin(vector<unsigned> S){
+	vector<vector<unsigned>> adjList = adjacency;
+	unsigned degMin = adjList[0].size();
+    unsigned degMinVertice = 0;
+    for(unsigned i=1; i<adjList.size(); i++){
+        if(adjList[i].size()<degMin && !isDominated(S,i)){
+            degMin=adjList[i].size();
+            degMinVertice=i;
+        }
+    }
+    if(degMinVertice==0 && isDominated(S,0)){
+        return -1;
+    }
+    else{return degMinVertice;}
+}
 
 
-int ClassicGraph::undominatedDegreeMin(vector<unsigned> S){
+unsigned ClassicGraph::undominatedDegreeMin(vector<unsigned> S){
 	vector<vector<unsigned>> adjList = adjacency;
 	unsigned degMin = adjList[0].size();
     unsigned degMinVertice = 0;
@@ -160,9 +273,8 @@ bool ClassicGraph::isDominating(vector<unsigned> S){
 	return true;
 }
 
-
 bool ClassicGraph::isDominated(vector<unsigned> S, unsigned vertice){
-    vector<unsigned> neighbors = adjacency[vertice];
+	vector<unsigned> neighbors = adjacency[vertice];
 	bool dominated = false;
 	if(find(S.begin(), S.end(), vertice)!=S.end()){
         dominated = true;
@@ -177,10 +289,97 @@ bool ClassicGraph::isDominated(vector<unsigned> S, unsigned vertice){
 	}
 	return dominated;
 }
+* */
 
+/// OK, TO COMPILE
+unsigned ClassicGraph::undominatedDegreeMin(vector<unsigned> S){
+	Node u = graph[0];
+	unsigned degmin = graph.size();
+	
+	for(unsigned i=0; i<graph.size(); i++){
+		unsigned deg = graph[i].getDeg();
+		if(deg < degmin && !isDominated(S, u)){
+			u = graph[i];
+			degmin = deg;
+		}
+	}
+	
+	// Case all nodes are dominated
+	if(isDominated(S, u)){ 
+		unsigned errorCode = 0;
+		errorCode--;
+		return errorCode; // Returns MAX_INT as an error
+	}
+	
+	// Normal case
+	return u.getID();
+}
+
+/// OK, TO COMPILE
+Node ClassicGraph::getNodeWithID(unsigned id){
+	/// This might quite slow if the graph is big
+	/// => If we have time left, try mapping the nodes?
+	vector<Node>::iterator it = graph.begin();
+	
+	while(true){
+		if(it->getID() == id){
+			return (*it);
+		}
+		it++;
+	}
+}
+
+/// OK, TO COMPILE
+bool ClassicGraph::isDominated(vector<unsigned> S, unsigned id){
+	vector<unsigned>::iterator it;
+	
+	// Case node already in S
+	it = find(S.begin(), S.end(), id);
+	if(it != S.end()){
+		return true;
+	}
+	
+	// Normal case
+	Node u = getNodeWithID(id);
+    return isDominated(S, u);
+}
+
+/// OK, TO COMPILE
+bool ClassicGraph::isDominated(vector<unsigned> S, Node u){
+	vector<unsigned>::iterator it;
+	
+	// Case node already in S
+	it = find(S.begin(), S.end(), u.getID());
+	if(it != S.end()){
+		return true;
+	}
+	
+	// Normal case
+    vector<unsigned> v = u.getNeighborsID();
+    
+	for(unsigned i=0; i<v.size(); i++){
+		it = find(S.begin(), S.end(), v[i]);
+		if(it != S.end()){ // one neighbor is in S
+			return true;
+        }
+    }
+    
+	return false;
+}
+
+/// OK, TO COMPILE
+bool ClassicGraph::isDominating(vector<unsigned> S){
+	for(unsigned i=0; i<graph.size(); i++){
+        if(!isDominated(S, graph[i])){
+            return false;
+        }
+    }
+	return true;
+}
 
 //==================================  Dijkstra  ============================================================
 
+/* OLD 24/01 morning
 unsigned ClassicGraph::Dijkstra(vector<unsigned> S){
 	processed = vector<bool> (adjacency.size(),false);
 	vector<unsigned> toProcessNow;
@@ -213,32 +412,65 @@ unsigned ClassicGraph::Dijkstra(vector<unsigned> S){
 
 	return maxDist;
 }
+*/
 
-unsigned ClassicGraph::bestDijkstra(unsigned k){
+/// OK, TO COMPILE
+unsigned ClassicGraph::Dijkstra(vector<unsigned> S){
+	vector<bool> processed = vector<bool> (graph.size(),false);
+	vector<unsigned> toProcessNow;
 
-	vector<unsigned> S;
-	//Creates first set
-	for(unsigned i=0; i<k, i++){
-        S.push_back(i);
+	for(unsigned i=0; i<S.size(); i++){ /// Set tuple elements to dist 0
+		dist[S[i]] = 0;
+		processed[S[i]]= true;
+		toProcessNow.push_back(S[i]);
 	}
 
-	unsigned bestDist = makeDijkstra(S);;
+	unsigned maxDist = 0;
+	while(toProcessNow.size() > 0){
+		Node u = getNodeWithID(toProcessNow.front());
+		vector<unsigned> v = u.getNeighborsID();
+		toProcessNow.erase(toProcessNow.begin()); // pop_front()
 
-	while(kuplet.isInMatrix(matrix, tuple)){
-		if(tuple[k].x() == matrix[0].size()){
-			printf(".");
+		if(dist[u.getID()] > maxDist){
+			maxDist = dist[u.getID()];
 		}
-		if(kuplet.hasNoWall(matrix, tuple)){
-			unsigned tmp = makeDijkstra(tuple);
-			if(tmp < bestDist){
-				bestDist = tmp;
+
+		for(unsigned j=0; j<v.size(); j++){ /// Process neighbors
+			if(!processed[v[j]]){
+                processed[v[j]] = true;
+                dist[v[j]] = dist[u.getID()] + 1;
+                toProcessNow.push_back(v[j]);
 			}
 		}
-
-		tuple = kuplet.nextElement(tuple);
 	}
+
+	return maxDist;
 }
-//Enumerate Kuplet
+
+/// OK, TO COMPILE
+vector<unsigned> ClassicGraph::bestDijkstra(unsigned k){
+	ClassicKuplet ck = ClassicKuplet(graph.size());
+	
+	//Creates first set
+	vector<unsigned> S = ck.firstElement(k);
+	vector<unsigned> bestSet = S;
+	unsigned bestDist = Dijkstra(S);;
+
+	while(S[0] != (graph.size()-1)-(k-1)){ // Format of the last set
+		S = ck.nextElement(S);
+		unsigned otherDist = Dijkstra(S);
+		
+		if(otherDist < bestDist){
+			bestDist = otherDist;
+			bestSet = S;
+		}
+	}
+	
+	return bestSet;
+}
+
+/*
+//Enumerate Kuplet - OK
 vector<unsigned> nextKuplet(vector<unsigned> S){
     for(unsigned k=1; k<S.size(); k++){
         if((S[k]-S[k-1])!=1){
@@ -251,10 +483,14 @@ vector<unsigned> nextKuplet(vector<unsigned> S){
     S[S.size()-1]=newVertice;
     return S;
 }
+*/
 
 
 
 
+
+
+/* OLD 24/01 morning
 vector<unsigned> ClassicGraph::listOfVertice(vector<vector<unsigned>> adjacencyList){
     vector<unsigned> listVertice;
     for(unsigned i=0; i<adjacencyList.size(); i++){
@@ -262,9 +498,10 @@ vector<unsigned> ClassicGraph::listOfVertice(vector<vector<unsigned>> adjacencyL
     }
     return listVertice;
 }
+*/
 
 
-
+/* OLD 24/01 morning
 unsigned ClassicGraph::verticeOfDegreeMin(vector<vector<unsigned>> adjacencyList){
     unsigned degMin = adjacencyList[0].size();
     unsigned degMinVertice = 0;
@@ -277,6 +514,7 @@ unsigned ClassicGraph::verticeOfDegreeMin(vector<vector<unsigned>> adjacencyList
     return degMinVertice;
 }
 
+
 //Check if left vertices form a complete graph for tree decomposition
 bool ClassicGraph::isComplete(vector<vector<unsigned>> adjacencyList){
     for(unsigned i=0; i<adjacencyList.size(); i++){
@@ -286,3 +524,9 @@ bool ClassicGraph::isComplete(vector<vector<unsigned>> adjacencyList){
     }
     return true;
 }
+*/
+
+
+
+
+

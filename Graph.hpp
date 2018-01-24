@@ -29,6 +29,7 @@ class Graph{
 	//Tree decomposition
 	vector<vector<Point>> tree;
 	vector<Signature> sigSet;
+	vector<Point> bestSelectedSet;
 	unsigned INFINITY;
 
 	// == PROTOTYPES ==
@@ -70,7 +71,7 @@ class Graph{
 	
 	void firstSigSet();
 	
-	void wololoLoop();
+	void mainLoop();
 	
 	Point diff(vector<Point> vp1, vector<Point> vp2);
 	

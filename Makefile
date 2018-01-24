@@ -1,8 +1,10 @@
 CC=g++
 
+FILES = Bag.cpp ClassicGraph.cpp ClassicKuplet.cpp graph.cpp GraphAux.cpp Kuplet.cpp Node.cpp Parser.cpp Point.cpp PointFactory.cpp Signature.cpp TreeDec.cpp TreeNode.cpp
 
-all: graph.cpp Parser.cpp Point.cpp Kuplet.cpp PointFactory.cpp Signature.cpp
-	$(CC) graph.cpp Parser.cpp Point.cpp Kuplet.cpp PointFactory.cpp Signature.cpp
+
+all: $(FILES)
+	$(CC) $(FILES)
 
 clean:
 	rm -rf *.o *.dot *.png

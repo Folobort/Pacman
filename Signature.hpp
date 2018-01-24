@@ -36,7 +36,7 @@ class Signature{
 	Signature copy();
 	
 	Signature updateBagWith(Point newPoint);
-	Signature removeLastFromBag();
+	void removeLastFromBag();
 	
 	// GETTERS
 	int getIndex(Point p);

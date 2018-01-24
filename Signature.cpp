@@ -49,14 +49,9 @@ Signature Signature::updateBagWith(Point newPoint){
 	return newSig;
 }
 
-Signature Signature::removeLastFromBag(){
-	Signature newSig = copy();
-	Point lastP = bag[bag.size()-1];
-	
+void Signature::removeLastFromBag(){
 	bag.pop_back();
 	stickers.pop_back();
-	
-	return newSig;
 }
 
 
@@ -123,9 +118,27 @@ bool Signature::isBetterFinalSig(Signature sig){
 vector<Signature> Signature::update(Point newPoint, vector<vector<vector<Point>>> neighbors){
 	vector<Signature> newSigs;
 	Signature newSig;
+/*
+	cout << "===========" << endl;
+	cout << "Point :" << endl;
+	cout << newPoint.toString() << endl;
+	cout << "===========" << endl;
+	
+
+	cout << "===========" << endl;
+	cout << "Sig init :" << endl;
+	cout << toString() << endl;
+	cout << "===========" << endl;
+*/
 
 	// We take the point to be removed next, and its neighbors in the graph.
 	Point toCover = bag.back();
+/*
+	cout << "===========" << endl;
+	cout << "PointTC :" << endl;
+	cout << toCover.toString() << endl;
+	cout << "===========" << endl;
+*/
 	unsigned stk = getSticker(toCover);
 	vector<Point> nb = neighbors[toCover.x()][toCover.y()];
 	
@@ -133,12 +146,25 @@ vector<Signature> Signature::update(Point newPoint, vector<vector<vector<Point>>
 		for(unsigned i=0; i<nb.size(); i++){ // select a neighbor
 			if(nb[i].isInVector(bag)){
 				newSig = updateF(newPoint, nb[i], neighbors);
+				/*
+				cout << "===========" << endl;
+				cout << "Sig added :" << endl;
+				cout << newSig.toString() << endl;
+				cout << "===========" << endl;
+				*/
+				
 				newSigs.push_back(newSig);
 			}
 		}
 		
 		// select point: same as (stk = STK_S)
 		newSig = updateS(newPoint, neighbors);
+		/*
+		cout << "===========" << endl;
+		cout << "Sig added :" << endl;
+		cout << newSig.toString() << endl;
+		cout << "===========" << endl;
+		*/
 		newSigs.push_back(newSig);
 	}
 	else if(stk == STK_C){ /// Covered: nothing to do, or select it
@@ -154,10 +180,10 @@ vector<Signature> Signature::update(Point newPoint, vector<vector<vector<Point>>
 		newSigs.push_back(newSig);
 	}
 	
-	
 	for(unsigned i=0; i<newSigs.size(); i++){
 		newSigs[i].toString();
 	}
+	
 	
 	return newSigs;
 }
@@ -234,7 +260,8 @@ vector<Signature> Signature::update(vector<vector<vector<Point>>> neighbors){
 }
 
 Signature Signature::updateF(Point selected, vector<vector<vector<Point>>> neighbors){
-	Signature newSig = copy().removeLastFromBag();
+	Signature newSig = copy();
+	newSig.removeLastFromBag();
 	
 	// set the point to selected
 	newSig.setSticker(selected, STK_S);
@@ -262,22 +289,31 @@ Signature Signature::updateS(vector<vector<vector<Point>>> neighbors){
 }
 
 Signature Signature::updateC(vector<vector<vector<Point>>> neighbors){
-	Signature newSig = copy().removeLastFromBag();
+	Signature newSig = copy();
+	newSig.removeLastFromBag();
 	
 	return newSig;
 }
 
 
 string Signature::toString(){
-	cout << "=====" << endl;
-	cout << "Sig :" << endl;
+	stringstream ss;
+	
+	ss << "=====" << endl;
+	ss << "Sig :" << endl;
 	for(unsigned i=0; i<bag.size(); i++){
-		cout << bag[i].toString() << " " << stickers[i] << endl;
+		ss << bag[i].toString() << " " << stickers[i] << endl;
 	}
-	cout << "selected :" << endl;
+	ss << "selected :" << endl;
+	
 	for(unsigned i=0; i<selected.size(); i++){
-		cout << selected[i].toString() << endl;
+		ss << selected[i].toString() << endl;
 	}
+	if(selected.size() == 0){
+		ss << "NONE" << endl;
+	}
+	
+	return ss.str();
 }
 
 
