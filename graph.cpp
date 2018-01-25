@@ -1,11 +1,8 @@
 #include <fstream>
 #include <iostream>
-#include <queue>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 #include "Graph.hpp"
 #include "Parser.hpp"
@@ -16,24 +13,8 @@
 
 using namespace std;
 
-
-
-
-Graph::Graph(){}
-
-
-
-
-/*
-vector<signature> VROUM(vector<Point> bag, vector<signature> sigSons){
-	for(unsigned i=0; i<sigSons.size(); i++){
-		walala updateSig(bag, sigSons[i]);
-	}
-}
-*/
-
-
-void Graph::setMatrix(vector<vector<bool>> matrix){
+/// -CONSTRUCTORS-
+Graph::Graph(vector<vector<bool>> matrix){
 	this->matrix = matrix;
 	
 	// Set PointFactory
@@ -63,115 +44,30 @@ void Graph::setMatrix(vector<vector<bool>> matrix){
 	dist = vector<vector<unsigned>> (matrix.size(), vector<unsigned>(matrix[0].size(), INFINITY));
 }
 
-void Graph::treeDecomposition(){
-    vector<Point> bag = firstBag();
-    
-    //Add bag to the tree decomposition
-    tree.push_back(bag);
-	
-    //Update bag
-    Point lastValid = lastNoWall();
-    
-    unsigned k = 0;
-    while(!(bag.back().equals(lastValid))){
-		bag = nextBag(bag);
-		tree.push_back(bag);
-	}
-	
-	//cout << "Created " << tree.size() << " bags!" << endl;
-	
+
+/// -GETTERS-
+bool Graph::isWall(unsigned x, unsigned y){
+	return !matrix[x][y];
+}
+bool Graph::isWall(Point p){
+	return isWall(p.x(), p.y());
 }
 
-vector<Point> Graph::firstBag(){
-	vector<Point> bag; //a bag contain each step of the tree decomposition starting with first line
-    Point p = pf.mkPoint(0,0);
-    while(isWall(p)){
-		p=p.next();
-	}
-    bag.push_back(p); // first no-wall Point
-    
-    while(bag.size() < matrix.size()+1){
-        do{
-			p=p.next();
-		} while(isWall(p));
-		
-        bag.push_back(p);
-    }
-	
-	return bag;
+unsigned Graph::degreeOf(Point point){
+	return neighbors[point.x()][point.y()].size();
 }
-
-vector<Point> Graph::nextBag(vector<Point> bag){
-	
-	Point nextAdd = bag.back().next();
-	
-	while(!nextAdd.isLast() && isWall(nextAdd)){
-		nextAdd = nextAdd.next();
-	}
-	
-	/* Should not be called normally
-	if(nextAdd.isLast || nextAdd.isWall){
-		return bag;
-		// bag was last valid bag, abort somehow
-	}
-	*/
-	
-	bag.erase(bag.begin());
-	bag.push_back(nextAdd);
-	
-	return bag;
-}
-
-
 
 Point Graph::lastNoWall(){
-	/// TO DO: Last valid should exist, but write safety just in case?
-	
 	Point lastValid = pf.mkPointLast();
 	
 	while(isWall(lastValid)){
 		lastValid = lastValid.before();
 	}
-
 	return lastValid;
 }
 
 
-
-bool Graph::isWall(unsigned x, unsigned y){
-	return !matrix[x][y];
-}
-
-bool Graph::isWall(Point p){
-	return isWall(p.x(), p.y());
-}
-
-
-
-bool Graph::isDominatedBy(vector<Point> tuple){
-		vector<vector<bool>> inTuple = vector<vector<bool>> (matrix.size(), vector<bool>(matrix[0].size(), false));
-
-		for(unsigned i=0; i<tuple.size(); i++){
-			inTuple[tuple[i].x()][tuple[i].y()] = true;
-		}
-
-		for(unsigned x=0; x<matrix.size(); x++){
-			for(unsigned y=0; y<matrix[0].size(); y++){
-				/// Wall, in the set, or next to an element of the set
-				if(isWall(x,y)) continue;
-				if(inTuple[x][y]) continue;
-				if(x > 0 && inTuple[x-1][y]) continue;
-				if(x < matrix.size()-1 && inTuple[x+1][y]) continue;
-				if(y > 0 && inTuple[x][y-1]) continue;
-				if(y < matrix[0].size()-1 && inTuple[x][y+1]) continue;
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
+/// -Dijkstra-
 unsigned Graph::makeDijkstra(vector<Point> tuple){	
 	processed = vector<vector<bool> > (matrix.size(), vector<bool>(matrix[0].size(), false));
 
@@ -224,7 +120,6 @@ unsigned Graph::makeDijkstra(vector<Point> tuple){
 }
 
 unsigned Graph::bestDijkstra(unsigned k){
-
 	Kuplet kuplet = Kuplet(k, matrix.size(), matrix[0].size());
 
 	vector<Point> tuple = kuplet.firstElement(k);
@@ -232,20 +127,15 @@ unsigned Graph::bestDijkstra(unsigned k){
 	while(!kuplet.hasNoWall(matrix, tuple)){
 		tuple = kuplet.nextElement(tuple);
 	}
+	
 	unsigned bestDist = makeDijkstra(tuple);
+	cout << "first bestDist : " << bestDist << endl;
 
 	while(kuplet.isInMatrix(matrix, tuple)){
-		if(kuplet.hasNoWall(matrix, tuple)){
-			for(unsigned i=0; i<k; i++){
-				cout << tuple[i].toString() << " ";
-			}
-			cout << endl;
-			
-				
+		if(kuplet.hasNoWall(matrix, tuple)){			
 			unsigned tmp = makeDijkstra(tuple);
 			if(tmp < bestDist){
 				bestDist = tmp;
-				
 				cout << "new bestDist : " << bestDist << endl;
 			}
 		}
@@ -256,13 +146,34 @@ unsigned Graph::bestDijkstra(unsigned k){
 	return bestDist;
 }
 
-unsigned Graph::degreeOf(Point point){
-	return neighbors[point.x()][point.y()].size();
-}
 
+/// -Brute force, branch and bound-
+bool Graph::isDominatedBy(vector<Point> tuple){
+		vector<vector<bool>> inTuple = vector<vector<bool>> (matrix.size(), vector<bool>(matrix[0].size(), false));
+
+		for(unsigned i=0; i<tuple.size(); i++){
+			inTuple[tuple[i].x()][tuple[i].y()] = true;
+		}
+
+		for(unsigned x=0; x<matrix.size(); x++){
+			for(unsigned y=0; y<matrix[0].size(); y++){
+				/// Wall, in the set, or next to an element of the set
+				if(isWall(x,y)) continue;
+				if(inTuple[x][y]) continue;
+				if(x > 0 && inTuple[x-1][y]) continue;
+				if(x < matrix.size()-1 && inTuple[x+1][y]) continue;
+				if(y > 0 && inTuple[x][y-1]) continue;
+				if(y < matrix[0].size()-1 && inTuple[x][y+1]) continue;
+
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 Point Graph::getSmallDegreeUndominated(vector<Point> S){
-	unsigned smallestDeg = 5;
+	unsigned smallestDeg = 5; // In a grid, only 4 neighbors
 	Point point = pf.mkPoint(0,0);
 
 	for(unsigned x=0; x<matrix.size(); x++){
@@ -282,31 +193,20 @@ Point Graph::getSmallDegreeUndominated(vector<Point> S){
 	return point;
 }
 
-vector<Point> Graph::getNeighbors(Point point){
-	vector<Point> neighborExtended = neighbors[point.x()][point.y()];
-	neighborExtended.push_back(point);
-
-	return neighborExtended;
-}
-
-
-
-
 vector<Point> Graph::getNeighborsUndominating(Point point, vector<Point> S){
-	vector<Point> neighbors = getNeighbors(point);
+	vector<Point> neighborsExtended = neighbors[point.x()][point.y()];
+	neighborsExtended.push_back(point);
+	
 	vector<Point> neighborsUndominating;
 
-	for(unsigned i=0; i<neighbors.size(); i++){
-		if(!neighbors[i].isInVector(S)){
-			neighborsUndominating.push_back(neighbors[i]);
+	for(unsigned i=0; i<neighborsExtended.size(); i++){
+		if(!neighborsExtended[i].isInVector(S)){
+			neighborsUndominating.push_back(neighborsExtended[i]);
 		}
 	}
 
 	return neighborsUndominating;
 }
-
-
-
 
 vector<Point> Graph::k_dominant(unsigned k, vector<Point> S){
 	if(S.size() == k){
@@ -319,28 +219,187 @@ vector<Point> Graph::k_dominant(unsigned k, vector<Point> S){
 
 	Point v = getSmallDegreeUndominated(S);
 
-	cout << "======================================" << endl;
-	cout << "v (" << degreeOf(v) << "): " << v.x() << " " << v.y() << endl;
-
 	vector<Point> neighbors = getNeighborsUndominating(v, S);
 
 	for(unsigned i=0; i<neighbors.size(); i++){
-
-		//cout << "N: " << neighbors[i].x() << ", " << neighbors[i].y() << endl;
-
 		vector<Point> S2 = S;
 		S2.push_back(neighbors[i]);
 
-		if(k_dominant(k, S2).size() != 0){
-			return S2;
+		vector<Point> S3 = k_dominant(k, S2);
+		if(S3.size() != 0){
+			return S3;
 		}
 	}
 
 	vector<Point> emptyV;
 	return emptyV; /// All sub-S failed
 }
+vector<Point> Graph::k_dominant(unsigned k){
+	vector<Point> emptySet;
+	
+	return k_dominant(k, emptySet);
+}
 
 
+/// -Tree decomposition, signatures-
+vector<Point> Graph::firstBag(){
+	vector<Point> bag; //a bag contain each step of the tree decomposition starting with first line
+    Point p = pf.mkPoint(0,0);
+    while(isWall(p)){
+		p=p.next();
+	}
+    bag.push_back(p); // first no-wall Point
+    
+    while(bag.size() < matrix.size()+1){
+        do{
+			p=p.next();
+		} while(isWall(p));
+		
+        bag.push_back(p);
+    }
+	
+	return bag;
+}
+
+vector<Point> Graph::nextBag(vector<Point> bag){
+	Point nextAdd = bag.back().next();
+	
+	while(!nextAdd.isLast() && isWall(nextAdd)){
+		nextAdd = nextAdd.next();
+	}
+	
+	bag.erase(bag.begin());
+	bag.push_back(nextAdd);
+	
+	return bag;
+}
+
+void Graph::treeDecomposition(){
+    vector<Point> bag = firstBag();
+    
+    //Add bag to the tree decomposition
+    tree.push_back(bag);
+	
+    //Update bag
+    Point lastValid = lastNoWall();
+    
+    unsigned k = 0;
+    while(!(bag.back().equals(lastValid))){
+		bag = nextBag(bag);
+		tree.push_back(bag);
+	}
+	
+	//cout << "Created " << tree.size() << " bags!" << endl;
+}
+
+
+Point Graph::diff(vector<Point> vp1, vector<Point> vp2){
+	for(unsigned i=0; i<vp2.size(); i++){
+		if(!vp2[i].isInVector(vp1)){
+			return vp2[i];
+		}
+	}
+	
+	cout << "ERR DIFF PLZ STOP" << endl; /// balancer une exception dans le cas d'égalité
+	return pf.mkPoint(0,0);
+}
+
+void Graph::firstSigSet(){
+	vector<Point> firstBag = tree[tree.size()-1];
+	
+	Signature newSig = Signature(firstBag);
+	sigSet.push_back(newSig);
+}
+
+vector<Signature> Graph::nextSigSet(Point newPoint){
+	vector<Signature> nextSigs;
+	
+	for(unsigned i=0; i<sigSet.size(); i++){
+		vector<Signature> sigSetElem = sigSet[i].update(newPoint, neighbors);
+		for(unsigned k=0; k<sigSetElem.size(); k++){
+			nextSigs.push_back(sigSetElem[k]);
+		}
+	}
+	
+	return cleanMultipleSig(nextSigs);
+}
+vector<Signature> Graph::nextSigSet(){
+	vector<Signature> nextSigs;
+	
+	for(unsigned i=0; i<sigSet.size(); i++){
+		vector<Signature> sigSetElem = sigSet[i].update(neighbors);
+		for(unsigned k=0; k<sigSetElem.size(); k++){
+			nextSigs.push_back(sigSetElem[k]);
+		}
+	}
+	
+	return cleanMultipleSig(nextSigs);
+}
+
+vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){
+	vector<Signature> cleanedSigs;
+	vector<bool> keepIndex(sigs.size(), true);
+	
+	for(unsigned i=0; i<sigs.size(); i++){
+		if(keepIndex[i]){
+			for(unsigned j=i+1; j<sigs.size(); j++){
+				if(keepIndex[j] && sigs[i].equals(sigs[j])){ // same apparent signature
+					if(sigs[i].getSelected().size() <= sigs[j].getSelected().size()){
+						keepIndex[j] = false;
+					}else{
+						keepIndex[i] = false;
+					}
+				}
+			}
+		}
+	}
+	
+	for(unsigned i=0; i<sigs.size(); i++){
+		if(keepIndex[i]){
+			cleanedSigs.push_back(sigs[i]);
+		}
+	}
+	
+	return cleanedSigs;
+}
+
+void Graph::solveTree(){
+	firstSigSet();
+
+	// Compute signatures up the tree-path
+	for(unsigned i=tree.size()-1; i>0; i--){ 
+		Point newPoint = diff(tree[i],tree[i-1]);
+	
+		sigSet = nextSigSet(newPoint);
+	}
+	
+	///cout << "SIGNATURES COUNT : " << sigSet.size() << endl;
+	
+	// Compute the signatures on the last bag (removing one point at a time)
+	for(unsigned i=0; i<tree[0].size(); i++){
+		sigSet = nextSigSet();
+
+		///cout << "=================" << endl;
+		///cout << "SIGNATURES COUNT " << i << " : " << sigSet.size() << endl;
+	}
+	
+	// Select best signature among the ones left
+	Signature finalSig = sigSet[0];
+	for(unsigned i=1; i<sigSet.size(); i++){
+		if(sigSet[i].isBetterFinalSig(finalSig)){
+			finalSig = sigSet[i];
+		}
+	}
+	
+	// Get the selected set from that signature
+	vector<Point> finalSet = finalSig.getSelected();
+	for(unsigned i=0; i<finalSet.size(); i++){
+		bestSelectedSet.push_back(finalSet[i]);
+	}
+}
+
+
+/// -To string-
 string Graph::toString(){
 	stringstream ss;
 	unsigned w = matrix.size();
@@ -348,7 +407,7 @@ string Graph::toString(){
 	
 	ss << "graph G {" << endl;
 	
-	// Force all positions
+	// Force all positions (for faithful display)
 	for(unsigned y=0; y<h; y++){
 		for(unsigned x=0; x<w; x++){
 			if(matrix[x][y]){ // Not a wall
@@ -386,189 +445,45 @@ string Graph::toString(){
 }
 
 
-vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficient first draft
-	vector<Signature> cleanedSigs;
-	vector<bool> keepIndex(sigs.size(), true);
-	
-	for(unsigned i=0; i<sigs.size(); i++){
-		if(keepIndex[i]){
-			for(unsigned j=i+1; j<sigs.size(); j++){
-				if(keepIndex[j] && sigs[i].equals(sigs[j])){ // same apparent signature
-					if(sigs[i].getSelected().size() <= sigs[j].getSelected().size()){
-						keepIndex[j] = false;
-					}else{
-						keepIndex[i] = false;
-					}
-				}
-			}
-		}
-	}
-	
-	for(unsigned i=0; i<sigs.size(); i++){
-		if(keepIndex[i]){
-			cleanedSigs.push_back(sigs[i]);
-		}
-	}
-	
-	//cout << "CLEANED!" << endl;
-	
-	return cleanedSigs;
-}
-
-vector<Signature> Graph::nextSigSet(Point newPoint){
-	vector<Signature> nextSigs;
-	
-	for(unsigned i=0; i<sigSet.size(); i++){
-		vector<Signature> sigSetElem = sigSet[i].update(newPoint, neighbors);
-		for(unsigned k=0; k<sigSetElem.size(); k++){
-			nextSigs.push_back(sigSetElem[k]);
-		}
-	}
-	
-	return cleanMultipleSig(nextSigs);
-}
-
-vector<Signature> Graph::nextSigSet(){
-	vector<Signature> nextSigs;
-	
-	for(unsigned i=0; i<sigSet.size(); i++){
-		vector<Signature> sigSetElem = sigSet[i].update(neighbors);
-		for(unsigned k=0; k<sigSetElem.size(); k++){
-			nextSigs.push_back(sigSetElem[k]);
-		}
-	}
-	
-	return cleanMultipleSig(nextSigs);
-}
-
-
-
-void Graph::solveTree(){
-	firstSigSet();
-
-	for(unsigned i=tree.size()-1; i>0; i--){ 
-		Point newPoint = diff(tree[i],tree[i-1]); // TO DO, returns the element of tree[i-1] that is not is tree[i]
-	
-		sigSet = nextSigSet(newPoint);
-	}
-	
-	
-	//cout << "SIGNATURES COUNT : " << sigSet.size() << endl;
-	//cout << "TREE[0].SIZE() = " << tree[0].size() << endl;
-	/*
-	for(unsigned i=0; i<sigSet.size(); i++){
-		cout << "size of selected #" << i << " : " << sigSet[i].getSelected().size() << endl;
-	
-		cout << "============" << endl;
-		if(sigSet[i].getSelected().size() == 0){
-			cout << sigSet[i].toString() << endl;
-		}
-		cout << "============" << endl;
-	}
-	*/
-	
-	
-	for(unsigned i=0; i<tree[0].size(); i++){
-		sigSet = nextSigSet();
-		/*
-		cout << "=================" << endl;
-		cout << "SIGNATURES COUNT " << i << " : " << sigSet.size() << endl;
-		
-		for(unsigned i=0; i<sigSet.size(); i++){
-			cout << "size of selected #" << i << " : " << sigSet[i].getSelected().size() << endl;
-		
-			cout << "============" << endl;
-			if(sigSet[i].getSelected().size() == 0){
-				cout << sigSet[i].toString() << endl;
-			}
-			cout << "============" << endl;
-		}
-		*/
-	}
-	
-	Signature finalSig = sigSet[0];
-	for(unsigned i=1; i<sigSet.size(); i++){
-		if(sigSet[i].isBetterFinalSig(finalSig)){
-			finalSig = sigSet[i];
-		}
-	}
-	
-	vector<Point> finalSet = finalSig.getSelected();
-	
-	/*
-	cout << "FINAL SET (size " << finalSet.size() << ") :" << endl;
-	for(unsigned i=0; i<finalSet.size(); i++){
-		cout << finalSet[i].toString() << endl;
-	}
-	*/
-	
-	
-	
-	for(unsigned i=0; i<finalSet.size(); i++){
-		bestSelectedSet.push_back(finalSet[i]);
-	}
-}
-
-
-void Graph::firstSigSet(){
-	vector<Point> firstBag = tree[tree.size()-1];
-	
-	Signature newSig = Signature(firstBag);
-	sigSet.push_back(newSig);
-}
-
-
-Point Graph::diff(vector<Point> vpI, vector<Point> vpIMinusOne){ // vp1 and vp2 must be of same size, and not equals
-	for(unsigned i=0; i<vpIMinusOne.size(); i++){
-		if(!vpIMinusOne[i].isInVector(vpI)){
-			return vpIMinusOne[i];
-		}
-	}
-	
-	cout << "ERR DIFF PLZ STAHP" << endl; /// balancer une exception dans le cas d'égalité
-	return pf.mkPoint(0,0);
-}
-
-
-
+/// -MAIN CALL-
 int main(){
-	unsigned k = 2;
-
+	unsigned k = 1;
 
 	Parser p;
-	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_nano.pbm");
-	
-	//p.showMatrix(matrix);
+	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_femtoTest.pbm");
 
-	Graph g = Graph();
-	g.setMatrix(matrix);
+	Graph g = Graph(matrix);
+
+/// Dijkstra
 
 	unsigned bestDist = g.bestDijkstra(k);
 
-	cout << endl;
+	cout << "===============" << endl;
 	cout << "best dist with k = " << k << " : " << bestDist << endl;
+	cout << "===============" << endl;
 
-// Branch and bound
-/*
-	vector<Point> emptyV;
-	vector<Point> kDom = g.k_dominant(k, emptyV);
+/// Branch and bound
+
+	vector<Point> kDom = g.k_dominant(k);
 
 	if(kDom.size() != 0){
-		cout << "Works with set of size " << k << ":" << endl;
+		cout << "There is a dominating set of size " << k << ":" << endl;
 		for(unsigned i=0; i<k-1; i++){
 			cout << kDom[i].toString() << ", ";
 		}
 		cout << kDom[k-1].toString() << endl;
 	} else{
-		cout << "Does not work with set of size " << k << endl;
+		cout << "Does not dominate with any set of size " << k << endl;
 	}
-*/
+
+
+/// Tree Decomposition
 
 	g.treeDecomposition();
-	//g.solveTree();
-	
+	g.solveTree();
 
-	//cout << g.toString() << endl;
+	cout << g.toString() << endl;
+
 
 
 	return 0;
