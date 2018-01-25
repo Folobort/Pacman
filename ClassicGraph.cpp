@@ -52,14 +52,20 @@ void ClassicGraph::treeDecomposition(){
 		
 		// Get one of the best nodes
 		Node u = gAux.getNodeDegmin();
-			
 		// Add new bag to the tree
 		Bag bag = Bag(u.getNeighborsID());
 		bag.add(u.getID());
+		
+		cout << "New Bag : ";
+		bag.toString();
+		
 		treeDec.addBag(bag);
-			
+		
 		// Remove the node and clickify the neighbors
 		gAux.removeAndLink(u);
+		
+		cout << "New graph : " << endl;
+		gAux.toString();
 	}
 }
 
@@ -182,8 +188,9 @@ vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
 }
 * */
 
-/// OK, TO COMPILE
+/// OK, DONE
 vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
+	
 	// Case size == k
 	if(S.size() == k){
 		if(isDominating(S)){
@@ -200,10 +207,12 @@ vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
 	errorCode--;
 	if(v == errorCode){ // All nodes are dominated by a set smaller than k
 		return S;
+		
 	}
 	
 	// Normal case
 	vector<unsigned> undominatedNeighbors = getNodeWithID(v).getNeighborsID();
+	undominatedNeighbors.push_back(v);
 	
 	// clean set of actually dominated nodes
 	vector<unsigned>::iterator it = undominatedNeighbors.end()-1;
@@ -220,9 +229,12 @@ vector<unsigned> ClassicGraph::k_dominant(unsigned k, vector<unsigned> S){
 	for(unsigned i=0; i<undominatedNeighbors.size(); i++){
 		vector<unsigned> S2 = S;
 		S2.push_back(undominatedNeighbors[i]);
-
-		if(k_dominant(k, S2).size() != 0){ // Not a fail, so bring it back up
-			return S2;
+		
+		vector<unsigned> S3 = k_dominant(k, S2);
+		
+		
+		if(S3.size() != 0){ // Not a fail, so bring it back up
+			return S3;
 		}
 	}
 
@@ -293,19 +305,19 @@ bool ClassicGraph::isDominated(vector<unsigned> S, unsigned vertice){
 
 /// OK, TO COMPILE
 unsigned ClassicGraph::undominatedDegreeMin(vector<unsigned> S){
+	
 	Node u = graph[0];
 	unsigned degmin = graph.size();
-	
 	for(unsigned i=0; i<graph.size(); i++){
 		unsigned deg = graph[i].getDeg();
-		if(deg < degmin && !isDominated(S, u)){
+		if(deg < degmin && !isDominated(S, graph[i])){
 			u = graph[i];
 			degmin = deg;
 		}
 	}
-	
+	cout << endl;
 	// Case all nodes are dominated
-	if(isDominated(S, u)){ 
+	if(degmin == graph.size()){ 
 		unsigned errorCode = 0;
 		errorCode--;
 		return errorCode; // Returns MAX_INT as an error
@@ -347,7 +359,6 @@ bool ClassicGraph::isDominated(vector<unsigned> S, unsigned id){
 /// OK, TO COMPILE
 bool ClassicGraph::isDominated(vector<unsigned> S, Node u){
 	vector<unsigned>::iterator it;
-	
 	// Case node already in S
 	it = find(S.begin(), S.end(), u.getID());
 	if(it != S.end()){
@@ -363,7 +374,6 @@ bool ClassicGraph::isDominated(vector<unsigned> S, Node u){
 			return true;
         }
     }
-    
 	return false;
 }
 
@@ -485,6 +495,36 @@ vector<unsigned> nextKuplet(vector<unsigned> S){
 }
 */
 
+string ClassicGraph::toString(){
+	stringstream ss;
+	
+	ss << "graph G {" << endl;
+	
+	// Declare nodes
+	for(unsigned i=0; i<graph.size(); i++){
+		string shapeStr;
+		/// TODO : selected cases
+		shapeStr = "shape = circle";
+		
+		ss << graph[i].getID() << "[" << shapeStr << "];" << endl;
+	}
+	
+	// Edges
+	for(unsigned i=0; i<graph.size(); i++){
+		Node u = graph[i];
+		vector<unsigned> v = u.getNeighborsID();
+		for(unsigned j=0; j<u.getDeg(); j++){
+			if(u.getID() < v[j]){
+				ss << u.getID() << "--" << v[j] << ";" << endl;
+			}
+		}
+	}
+	
+
+	ss << "}";
+	
+	return ss.str();
+}
 
 
 

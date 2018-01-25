@@ -1,19 +1,18 @@
 #include <fstream>
 #include <iostream>
-#include <queue>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 #include "Parser.hpp"
 
 using namespace std;
 
-
+/// -CONSTRUCTOR-
 Parser::Parser(){}	
 
+
+/// -Parser-
 void Parser::makeMatrix(unsigned width, unsigned height){
 	matrix = vector<vector<bool>> (width, vector<bool>(height, false));
 }
@@ -39,8 +38,7 @@ vector<vector<bool>> Parser::parse(string fileName){
 		if(line.compare("P1")!=0 && line.compare("P4")!=0){
 			exit(EXIT_FAILURE);
 		}
-			
-		//cout << "TYPE" << endl;
+
 		break;
 	} 
 
@@ -89,7 +87,8 @@ vector<vector<bool>> Parser::parse(string fileName){
 	return matrix;
 }
 
-  
+
+/// -To string-
 void Parser::showMatrix(vector<vector<bool> > m){
 	unsigned height = m.size();
 	unsigned width = m[0].size();

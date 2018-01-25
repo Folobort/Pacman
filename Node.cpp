@@ -11,6 +11,10 @@ Node::Node(){
 	this->id = 0;
 }
 
+Node::Node(unsigned id){
+	this->id = id;
+}
+
 Node::Node(unsigned id, vector<unsigned> neighborsID){
 	this->id = id;
 	this-> neighborsID = neighborsID;
@@ -49,7 +53,7 @@ void Node::addNeighbors(vector<unsigned> v){
 void Node::removeNeighbor(unsigned v){
 	vector<unsigned>::iterator it = find(neighborsID.begin(), neighborsID.end(), v);
 	
-	if(it == neighborsID.end()){
+	if(it != neighborsID.end()){
 		neighborsID.erase(it);
 	}
 }

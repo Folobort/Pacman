@@ -10,6 +10,9 @@
 #include "Point.hpp"
 #include "PointFactory.hpp"
 #include "Signature.hpp"
+#include "ClassicParser.hpp"
+#include "ClassicGraph.hpp"
+#include "Node.hpp"
 
 using namespace std;
 
@@ -447,6 +450,8 @@ string Graph::toString(){
 
 /// -MAIN CALL-
 int main(){
+/// GRID MAIN	
+/*
 	unsigned k = 1;
 
 	Parser p;
@@ -454,7 +459,7 @@ int main(){
 
 	Graph g = Graph(matrix);
 
-/// Dijkstra
+	/// Dijkstra
 
 	unsigned bestDist = g.bestDijkstra(k);
 
@@ -462,7 +467,7 @@ int main(){
 	cout << "best dist with k = " << k << " : " << bestDist << endl;
 	cout << "===============" << endl;
 
-/// Branch and bound
+	/// Branch and bound
 
 	vector<Point> kDom = g.k_dominant(k);
 
@@ -476,15 +481,33 @@ int main(){
 		cout << "Does not dominate with any set of size " << k << endl;
 	}
 
-
-/// Tree Decomposition
-
+	/// Tree Decomposition
 	g.treeDecomposition();
 	g.solveTree();
 
 	cout << g.toString() << endl;
+	
+	return 0;
+*/
 
-
+/// CLASSIC MAIN
+	ClassicParser p;
+	vector<Node> graph=p.parse("testparser.txt");
+	ClassicGraph g= ClassicGraph(graph);
+	
+	cout << "Graph from gengraph" << endl;
+	cout << g.toString() << endl;
+	
+/*	
+	vector<unsigned> S;
+	vector<unsigned> dominant = g.k_dominant(3, S);
+	
+	cout << "Sommet dominants : " << endl;
+	for(unsigned j=0; j<dominant.size(); j++){
+		cout << dominant[j] << endl;
+	}
+*/
+	
 
 	return 0;
 }

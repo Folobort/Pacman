@@ -1,23 +1,16 @@
-#include <fstream>
-#include <iostream>
-#include <queue>
-#include <string>
-#include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 #include "Point.hpp"
 #include "PointFactory.hpp"
 
 using namespace std;
 
-// CONSTRUCTOR
+/// -CONSTRUCTOR-
 PointFactory::PointFactory(vector<vector<bool>> m){
 	matrix = m;
 }
 
-// POINT CONSTRUCTORS
+/// -POINT CONSTRUCTORS-
 Point PointFactory::mkPoint(unsigned x, unsigned y){
 	unsigned w = matrix.size();
 	unsigned h = matrix[0].size();

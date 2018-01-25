@@ -6,6 +6,9 @@
 #include "Point.hpp"
 #include "PointFactory.hpp"
 #include "Signature.hpp"
+#include "ClassicParser.hpp"
+#include "ClassicGraph.hpp"
+#include "Node.hpp"
 
 using namespace std;
 

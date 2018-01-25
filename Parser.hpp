@@ -1,30 +1,28 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-#include <fstream>
-#include <iostream>
-#include <queue>
 #include <string>
-#include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 using namespace std;
 
 class Parser{
 	// DATA
-	vector<vector<bool>> matrix;
+	vector<vector<bool>> matrix;	// Space to work on
 	
 	// PROTOTYPES
 	public:
-	Parser();	
+	
+	/// -CONSTRUCTOR-
+	Parser();
 
-	void makeMatrix(unsigned width, unsigned height);
+	/// -Parser-
+	void makeMatrix(unsigned width, unsigned height);	// Creates a matrix of specified dimensions
 
-	vector<vector<bool> > parse(string fileName);
+	vector<vector<bool> > parse(string fileName);		// Parses the specified pbm file into a matrix
   
-	void showMatrix(vector<vector<bool>> m);
+	/// -To string-
+	void showMatrix(vector<vector<bool>> m);			// Displays matrix content
 };
 
 

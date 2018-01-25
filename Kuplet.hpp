@@ -1,14 +1,7 @@
 #ifndef KUPLET_H_
 #define KUPLET_H_
 
-#include <fstream>
-#include <iostream>
-#include <queue>
-#include <string>
-#include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 using namespace std;
 
@@ -24,16 +17,16 @@ class Kuplet{
 	// == PROTOTYPES ==
 	public:
 	
-	// CONSTRUCTOR
+	/// -CONSTRUCTOR-
 	Kuplet(unsigned k, unsigned w, unsigned h);
 	
-	// BAG CONSTRUCTORS
-	vector<Point> firstElement (unsigned size);			/// Bag of defined size, with point of least position values (ie, top-leftest bag)
-	vector<Point> nextElement (vector<Point> element);
+	/// -TUPLE CONSTRUCTORS-
+	vector<Point> firstElement (unsigned size);			// Creates a tuple of defined size, with point of least position values (ie, top-leftest bag)
+	vector<Point> nextElement (vector<Point> element);	// Returns the tuple that follows the parameter (according our strict ordering, that is a shift to the right)
 	
-	// OTHERS
-	bool hasNoWall(vector<vector<bool>> matrix, vector<Point> element);
-	bool isInMatrix(vector<vector<bool>> matrix, vector<Point> element);
+	/// -OTHERS-
+	bool hasNoWall(vector<vector<bool>> matrix, vector<Point> element);		// Returns False if any point of the tuple is in a wall state, True otherwise
+	bool isInMatrix(vector<vector<bool>> matrix, vector<Point> element);	// Checks if all points of the tuple are refering to valid coordinates in the grid
 
 };
 

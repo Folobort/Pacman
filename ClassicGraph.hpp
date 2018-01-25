@@ -96,6 +96,8 @@ class ClassicGraph{
     unsigned Dijkstra(vector<unsigned> S);
     vector<unsigned> bestDijkstra(unsigned k);
     
+    //TO STRING
+    string toString();
     
     /*
     bool isComplete(vector<vector<unsigned>> adjacencyList);

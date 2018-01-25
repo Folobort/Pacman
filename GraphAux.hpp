@@ -27,6 +27,8 @@ class GraphAux{
 	
 	bool hasNodes();
 	bool isComplete();
+	
+	void toString();
 };
 
 

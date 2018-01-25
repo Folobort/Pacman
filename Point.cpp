@@ -1,17 +1,12 @@
-#include <fstream>
-#include <iostream>
-#include <queue>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 #include "Point.hpp"
 
 using namespace std;
 
-// CONSTRUCTORS
+/// -CONSTRUCTORS-
 Point::Point(unsigned x, unsigned y, unsigned w, unsigned h){
 	coordX = x;
 	coordY = y;
@@ -66,7 +61,7 @@ Point Point::down(){
 	return Point(coordX, coordY+1, width, height);
 }
 
-// GETTERS
+/// -GETTERS-
 unsigned Point::x(){
 	return coordX;
 }
@@ -75,10 +70,10 @@ unsigned Point::y(){
 }
 
 unsigned Point::position(){
-	return coordX*width + coordY;
+	return coordY*width + coordX;
 }
 
-// OTHERS
+/// -OTHERS-
 bool Point::isLast(){
 	return (coordX == width-1) && (coordY == height-1);
 }
@@ -98,7 +93,7 @@ bool Point::isInVector(vector<Point> S){
 	return false;
 }
 
-// TO STRING
+/// -TO STRING-
 string Point::toString(){
 	stringstream ss;
 	ss << "(" << x() << "," << y() << ")";

@@ -1,14 +1,7 @@
 #ifndef POINTFACTORY_H_
 #define POINTFACTORY_H_
 
-#include <fstream>
-#include <iostream>
-#include <queue>
-#include <string>
-#include <sstream>
 #include <vector>
-#include <map>
-#include <algorithm>
 
 #include "Point.hpp"
 
@@ -16,17 +9,17 @@ using namespace std;
 
 class PointFactory{
 	// == DATA ==
-	vector<vector<bool>> matrix; // false for wall
+	vector<vector<bool>> matrix; 	// Matrix of the Point state: True for empty, False for wall
 	
 	// == PROTOTYPES ==
 	public:
 	
-	// CONSTRUCTOR
+	/// -CONSTRUCTOR-
 	PointFactory(vector<vector<bool>> m);
 	
-	// POINT CONSTRUCTORS
+	/// -POINT CONSTRUCTORS-
 	Point mkPoint(unsigned x, unsigned y);
-	Point mkPointLast();
+	Point mkPointLast();					// Returns the bottom-right point of the grid
 };
 
 
