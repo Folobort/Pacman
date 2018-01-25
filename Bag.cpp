@@ -1,4 +1,10 @@
-
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <map>
+#include <algorithm>
 #include <vector>
 #include <algorithm>
 
@@ -33,6 +39,13 @@ void Bag::remove(unsigned e){
 	if(it != content.end()){
 		content.erase(it);
 	}
+}
+
+void Bag::toString(){
+	for(unsigned j=0; j<content.size(); j++){
+		cout << " - " << content[j];
+	}
+	cout << " - " << endl;
 }
 
 

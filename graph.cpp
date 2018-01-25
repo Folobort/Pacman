@@ -13,6 +13,9 @@
 #include "Point.hpp"
 #include "PointFactory.hpp"
 #include "Signature.hpp"
+#include "ClassicParser.hpp"
+#include "ClassicGraph.hpp"
+#include "Node.hpp"
 
 using namespace std;
 
@@ -534,11 +537,12 @@ Point Graph::diff(vector<Point> vpI, vector<Point> vpIMinusOne){ // vp1 and vp2 
 int main(){
 	unsigned k = 2;
 
-
+/*
 	Parser p;
 	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_nano.pbm");
 	
 	//p.showMatrix(matrix);
+
 
 	Graph g = Graph();
 	g.setMatrix(matrix);
@@ -547,6 +551,7 @@ int main(){
 
 	cout << endl;
 	cout << "best dist with k = " << k << " : " << bestDist << endl;
+*/
 
 // Branch and bound
 /*
@@ -563,7 +568,23 @@ int main(){
 		cout << "Does not work with set of size " << k << endl;
 	}
 */
-
+	ClassicParser p;
+	vector<Node> graph=p.parse("testparser.txt");
+	ClassicGraph g= ClassicGraph(graph);
+	
+	cout << "Graph from gengraph" << endl;
+	cout << g.toString() << endl;
+	
+/*	
+	vector<unsigned> S;
+	vector<unsigned> dominant = g.k_dominant(3, S);
+	
+	cout << "Sommet dominants : " << endl;
+	for(unsigned j=0; j<dominant.size(); j++){
+		cout << dominant[j] << endl;
+	}
+*/
+	
 	g.treeDecomposition();
 	//g.solveTree();
 	

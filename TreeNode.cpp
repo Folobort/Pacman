@@ -1,4 +1,10 @@
-
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <iterator>
+#include <sstream>
 #include <vector>
 #include <algorithm>
 
@@ -24,6 +30,27 @@ bool TreeNode::getIsRoot(){
 Bag TreeNode::getBag(){
 	return bag;
 }
+
+vector<ClassicSignature> getSigSet(){
+	return sigSet;
+}
+	
+unsigned getToCover(){
+	vector<unsigned> parentBag = *parent.getBag();
+	
+	//Normal Case
+	for(unsigned j=0; j<bag.size(); j++){
+		if(find(parentBag.begin(), parentBag.end(), bag[j])==parentBag.end()){
+			return bag[j];
+		}
+	}
+	
+	//Case all of vertice are in parent's bag, return error
+	unsigned errorBag = 0;
+	errorBag--;
+	return errorBag;
+}
+	
 	
 // OTHER
 void TreeNode::addParent(TreeNode tn){
@@ -54,6 +81,14 @@ bool TreeNode::isGreaterThan(TreeNode tn){
 	return true;
 }
 
+
+void TreeNode::toString(){
+	bag.toString();
+	if(isRoot){
+		cout << " root " << endl;
+	}
+	else{cout << " no root " << endl;}
+}
 
 
 

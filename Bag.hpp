@@ -22,6 +22,8 @@ class Bag{
 	// OTHER
 	void add(unsigned e);		// Add element e if not already in content
 	void remove(unsigned e);	// Remove element e if present in content
+	
+	void toString();
 };
 
 

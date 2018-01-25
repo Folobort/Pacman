@@ -1,4 +1,10 @@
-
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <map>
+#include <algorithm>
 #include <vector>
 
 #include "GraphAux.hpp"
@@ -73,7 +79,16 @@ bool GraphAux::isComplete(){
 	return true;
 }
 
-
+void GraphAux::toString(){
+	for(unsigned i=0; i<graph.size(); i++){
+		cout << graph[i].getID() << " : ";
+		vector<unsigned> v= graph[i].getNeighborsID();
+		for(unsigned j=0; j<v.size(); j++){
+			cout << v[j] << " - ";
+		}
+		cout << endl;
+	}
+}
 
 
 

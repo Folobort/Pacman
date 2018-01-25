@@ -17,6 +17,7 @@ class Node{
 	
 	// CONSTRUCTORS
 	Node(); /// Should not be used as it is (only to "prepare" a variable name!)
+	Node(unsigned id);
 	Node(unsigned id, vector<unsigned> neighborsID);
 	
 	// GETTERS

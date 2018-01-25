@@ -1,4 +1,11 @@
-
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <map>
+#include <algorithm>
+#include <iterator>
 #include <vector>
 
 using namespace std;
@@ -40,13 +47,14 @@ void TreeDec::addBag(Bag bag){
 			it->addParent(tn);
 		}
 	}
-	
+	cout << "lololo" << endl;
 	// clean the root list (starting at the end to keep track of iterator when erasing)
 	vector<TreeNode>::iterator it = roots.end()-1;
 	while(it != roots.begin()){
 		if(it->getIsRoot() == false){ // no longer a root
 			roots.erase(it);
 		}
+		it--;
 	}
 	if(it->getIsRoot() == false){ // no longer a root
 		roots.erase(it);
