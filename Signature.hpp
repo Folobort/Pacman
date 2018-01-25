@@ -15,6 +15,7 @@
 
 using namespace std;
 
+// THREE POSSIBLE STATES (Free, Covered, Selected)
 #define STK_F 0
 #define STK_C 1
 #define STK_S 2
