@@ -15,7 +15,7 @@ using namespace std;
 Parser::Parser(){}	
 
 void Parser::makeMatrix(unsigned width, unsigned height){
-	matrix = vector<vector<bool>> (height, vector<bool>(width, false));
+	matrix = vector<vector<bool>> (width, vector<bool>(height, false));
 }
 
 vector<vector<bool>> Parser::parse(string fileName){

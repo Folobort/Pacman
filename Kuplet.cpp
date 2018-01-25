@@ -36,6 +36,7 @@ vector<Point> Kuplet::firstElement (unsigned size){
 	return first_element;
 }
 
+/*
 vector<Point> Kuplet::nextElement (vector<Point> element){
 	vector<Point> next_element;
 	
@@ -44,7 +45,7 @@ vector<Point> Kuplet::nextElement (vector<Point> element){
 		return next_element;
 	}
 		
-	//Trouver le plus petit indice i tel que S[i]+1<S[i+1]
+	//Trouver le plus petit indice i tel que S[i]+1 < S[i+1]
 	int i = 0;
 	int s = 0; int t = 0;
 	do {
@@ -67,6 +68,43 @@ vector<Point> Kuplet::nextElement (vector<Point> element){
 		
 	return next_element;
 }
+*/
+
+vector<Point> Kuplet::nextElement (vector<Point> element){
+	vector<Point> next_element;
+	
+	if(element.size() == 1){
+		next_element.push_back(element[0].next());
+		return next_element;
+	}
+		
+	//Trouver le plus petit indice i tel que S[i]+1 < S[i+1]
+	unsigned i=0;
+	unsigned pos1 = element[0].position();
+	unsigned pos2 = element[1].position();
+	
+	while((i<k-1) && (pos2-pos1 == 1)){
+		i++;
+		pos1 = element[i].position();
+		pos2 = element[i+1].position();
+	}
+	
+	// "retour chariot" des elements avant i s'il y en a
+	if(i > 0){
+		next_element = firstElement(i-1);
+	}
+	
+	// shift element i
+	next_element.push_back(element[i].next());
+	
+	// keep the rest as it is
+	for(unsigned j=i+1; j<element.size(); j++){
+		next_element.push_back(element[j]);
+	}
+	
+	return next_element;
+}
+
 
 // OTHERS
 
@@ -80,10 +118,10 @@ bool Kuplet::hasNoWall(vector<vector<bool>> matrix, vector<Point> element){
 	return true;
 }
 
-bool Kuplet::isInMatrix(vector<vector<bool>> matrix, vector<Point> element){
+bool Kuplet::isInMatrix(vector<vector<bool>> matrix, vector<Point> element){	
 	for(unsigned i=0; i<element.size(); i++){
-		if(element[i].x() < 0 && element[i].x() >= matrix.size() &&
-		   element[i].y() < 0 && element[i].y() >= matrix[0].size()){
+		if(element[i].x() < 0 || element[i].x() >= matrix.size() ||
+		   element[i].y() < 0 || element[i].y() >= matrix[0].size()){
 			return false;
 		}
 	}

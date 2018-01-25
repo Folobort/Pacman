@@ -7,4 +7,4 @@ all: $(FILES)
 	$(CC) $(FILES)
 
 clean:
-	rm -rf *.o *.dot *.png
+	rm -rf *.o *.dot *.png a.out

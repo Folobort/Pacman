@@ -172,7 +172,7 @@ bool Graph::isDominatedBy(vector<Point> tuple){
 		return true;
 	}
 
-unsigned Graph::makeDijkstra(vector<Point> tuple){
+unsigned Graph::makeDijkstra(vector<Point> tuple){	
 	processed = vector<vector<bool> > (matrix.size(), vector<bool>(matrix[0].size(), false));
 
 	vector<Point> toProcessNow;
@@ -182,7 +182,7 @@ unsigned Graph::makeDijkstra(vector<Point> tuple){
 
 		toProcessNow.push_back(tuple[i]);
 	}
-
+	
 	unsigned maxDist = 0;
 	while(toProcessNow.size() > 0){
 		Point point = toProcessNow.front();
@@ -228,24 +228,32 @@ unsigned Graph::bestDijkstra(unsigned k){
 	Kuplet kuplet = Kuplet(k, matrix.size(), matrix[0].size());
 
 	vector<Point> tuple = kuplet.firstElement(k);
+	
 	while(!kuplet.hasNoWall(matrix, tuple)){
 		tuple = kuplet.nextElement(tuple);
 	}
-	unsigned bestDist = makeDijkstra(tuple);;
+	unsigned bestDist = makeDijkstra(tuple);
 
 	while(kuplet.isInMatrix(matrix, tuple)){
-		if(tuple[k].x() == matrix[0].size()){
-			printf(".");
-		}
 		if(kuplet.hasNoWall(matrix, tuple)){
+			for(unsigned i=0; i<k; i++){
+				cout << tuple[i].toString() << " ";
+			}
+			cout << endl;
+			
+				
 			unsigned tmp = makeDijkstra(tuple);
 			if(tmp < bestDist){
 				bestDist = tmp;
+				
+				cout << "new bestDist : " << bestDist << endl;
 			}
 		}
 
 		tuple = kuplet.nextElement(tuple);
 	}
+	
+	return bestDist;
 }
 
 unsigned Graph::degreeOf(Point point){
@@ -380,7 +388,7 @@ string Graph::toString(){
 
 vector<Signature> Graph::cleanMultipleSig(vector<Signature> sigs){ // inefficient first draft
 	vector<Signature> cleanedSigs;
-	vector<bool> keepIndex(true, sigs.size());
+	vector<bool> keepIndex(sigs.size(), true);
 	
 	for(unsigned i=0; i<sigs.size(); i++){
 		if(keepIndex[i]){
@@ -435,7 +443,7 @@ vector<Signature> Graph::nextSigSet(){
 
 
 
-void Graph::mainLoop(){
+void Graph::solveTree(){
 	firstSigSet();
 
 	for(unsigned i=tree.size()-1; i>0; i--){ 
@@ -495,6 +503,7 @@ void Graph::mainLoop(){
 	*/
 	
 	
+	
 	for(unsigned i=0; i<finalSet.size(); i++){
 		bestSelectedSet.push_back(finalSet[i]);
 	}
@@ -523,7 +532,7 @@ Point Graph::diff(vector<Point> vpI, vector<Point> vpIMinusOne){ // vp1 and vp2 
 
 
 int main(){
-	unsigned k = 10;
+	unsigned k = 2;
 
 
 	Parser p;
@@ -534,12 +543,13 @@ int main(){
 	Graph g = Graph();
 	g.setMatrix(matrix);
 
-	//unsigned bestDist = g.bestDijkstra(k);
+	unsigned bestDist = g.bestDijkstra(k);
 
-	//cout << endl;
-	//cout << "best dist with k = " << k << " : " << bestDist << endl;
+	cout << endl;
+	cout << "best dist with k = " << k << " : " << bestDist << endl;
 
-/* Branch and bound
+// Branch and bound
+/*
 	vector<Point> emptyV;
 	vector<Point> kDom = g.k_dominant(k, emptyV);
 
@@ -555,10 +565,10 @@ int main(){
 */
 
 	g.treeDecomposition();
-	g.mainLoop();
+	//g.solveTree();
 	
 
-	cout << g.toString() << endl;
+	//cout << g.toString() << endl;
 
 
 	return 0;

@@ -71,7 +71,7 @@ class Graph{
 	
 	void firstSigSet();
 	
-	void mainLoop();
+	void solveTree();
 	
 	Point diff(vector<Point> vp1, vector<Point> vp2);
 	
