@@ -164,7 +164,8 @@ void TreeNode::computeMySigSet(vector<Node> graph){
 		}
 	}
 	
-	/// CLEAN DUPLICATES SOMEWHERE
+	// Clean duplicates
+	CleanSigSet();
 }
 
 
@@ -249,6 +250,39 @@ Node TreeNode::getNodeWithID(unsigned id, vector<Node> graph){
 		it++;
 	}
 }
+
+
+
+
+
+void TreeNode::CleanSigSet(){
+	vector<ClassicSignature> cleanedSigs;
+	
+	vector<bool> keepIndex(sigSet.size(), true);
+	
+	for(unsigned i=0; i<sigSet.size(); i++){
+		if(keepIndex[i]){
+			for(unsigned j=i+1; j<sigSet.size(); j++){
+				if(keepIndex[j] && sigSet[i].equals(sigSet[j])){ // same apparent signature
+					if(sigSet[i].getSelectedID().size() <= sigSet[j].getSelectedID().size()){
+						keepIndex[j] = false;
+					}else{
+						keepIndex[i] = false;
+					}
+				}
+			}
+		}
+	}
+	
+	for(unsigned i=0; i<sigSet.size(); i++){
+		if(keepIndex[i]){
+			cleanedSigs.push_back(sigSet[i]);
+		}
+	}
+	
+	sigSet = cleanedSigs;	
+}
+
 
 
 

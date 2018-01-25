@@ -50,7 +50,7 @@ class TreeNode{
 	
 	ClassicSignature sumSignature(vector<ClassicSignature> chosenSigs, vector<Node> graph);
 
-
+	void CleanSigSet();
 };
 
 
