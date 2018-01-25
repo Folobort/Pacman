@@ -7,6 +7,7 @@ using namespace std;
 
 #include "Bag.hpp"
 #include "ClassicSignature.hpp"
+#include "Node.hpp"
 
 class TreeNode{
 	// == DATA ==
@@ -31,7 +32,9 @@ class TreeNode{
 	
 	vector<ClassicSignature> getSigSet();
 	
-	unsigned getToCover();
+	unsigned getIdToCover();
+	
+	Node getNodeWithID(unsigned id, vector<Node> graph);
 	
 	// OTHER
 	void addParent(TreeNode tn);
@@ -42,10 +45,12 @@ class TreeNode{
 	void toString();
 	
 	
-	void computeMySigSet(vector<vector<ClassicSignature>> childrenSigSet);
-	vector<vector<ClassicSignature>> getChildrenSigSet(); //Update sigSet with children's
+	void computeMySigSet(vector<Node> graph);
+	vector<vector<ClassicSignature>> getChildrenSigSet(vector<Node> graph); //Update sigSet with children's
 	
-	
+	ClassicSignature sumSignature(vector<ClassicSignature> chosenSigs, vector<Node> graph);
+
+
 };
 
 

@@ -12,10 +12,7 @@
 #include <algorithm>
 
 #include "Node.hpp"
-#include "TreeDec.hpp"
-#include "TreeNode.hpp"
-#include "Signature.hpp"
-#include "GraphAux.hpp"
+#include "Bag.hpp"
 
 using namespace std;
 
@@ -24,53 +21,56 @@ using namespace std;
 #define STK_S 2
 
 
-class Signature{
+
+class ClassicSignature{
 	// == DATA ==
+	Bag treeBag;
+	
 	vector<unsigned> stickers;	// And their state (Free, Covered, Selected)
 	
 	vector<unsigned> selectedID;		// Selected points that are no longer stored in the bag vector
+	
 	
 	// == PROTOTYPES ==
 	public:
 	
 	//CONSTRUCTORS
-	Signature();
-	Signature(TreeNode bg);
-	Signature copy();
-	
-	Signature updateBagWith(Point newPoint);
-	void removeLastFromBag();
+	ClassicSignature();
+	ClassicSignature(Bag bg);
+	ClassicSignature copy();
 	
 	// GETTERS
-	int getIndex(unsigned u);
+	int getIndex(unsigned id);
 	unsigned getSticker(unsigned u);
 	
-	vector<unsigned> getBag();
+	Bag getBag();
 	vector<unsigned> getStickers();
-	vector<unsigned> getSelected();
+	vector<unsigned> getSelectedID();
+	
+	unsigned getToCover();
+	
+	Node getNodeWithID(unsigned id, vector<Node> graph);
 	
 	// SETTERS
-	void setSticker(unsigned u, unsigned stk);
-	void select(unsigned u);		/// pseudo-setter
+	void setSticker(unsigned id, unsigned stk);
+	void select(unsigned idSelected);		/// pseudo-setter
 	
 	// COMPARATORS
-	bool equals(Signature sig);
-	bool isBetterFinalSig(Signature sig);
+	bool equals(ClassicSignature sig);
+	bool isBetterFinalSig(ClassicSignature sig);
 	
 	// OTHERS
-	vector<Signature> update(Point newPoint, vector<vector<vector<Point>>> neighbors);
-	Signature updateF(Point newPoint, Point selected, vector<vector<vector<Point>>> neighbors);
-	Signature updateS(Point newPoint, vector<vector<vector<Point>>> neighbors);
-	Signature updateC(Point newPoint, vector<vector<vector<Point>>> neighbors);
 	
+	bool isInBag(unsigned id);
+	ClassicSignature sumSignature(vector<ClassicSignature>);
 	
-	Signature sum( Signature sig1; Signature Sig2);
+	void remove(unsigned id);
 
 
-	vector<Signature> update(vector<vector<vector<Point>>> neighbors);
-	Signature updateF(Point selected, vector<vector<vector<Point>>> neighbors);
-	Signature updateS(vector<vector<vector<Point>>> neighbors);
-	Signature updateC(vector<vector<vector<Point>>> neighbors);
+	vector<ClassicSignature> update(unsigned idToCover, vector<Node> graph);
+	ClassicSignature updateF(unsigned idToCover, unsigned idSelected, vector<Node> graph);
+	ClassicSignature updateS(unsigned idSelected, vector<Node> graph);
+	ClassicSignature updateC(unsigned idCovered);
 	
 	// TO STRING
 	string toString();
