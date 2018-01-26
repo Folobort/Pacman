@@ -16,8 +16,11 @@ using namespace std;
 #include "Node.hpp"
 
 // CONSTRUCTORS
+TreeNode::TreeNode(){}
+
 TreeNode::TreeNode(Bag bag){
 	this->bag = bag;
+	this->parent = new TreeNode;
 	isRoot = true;
 }
 TreeNode::TreeNode(vector<unsigned> bag){
@@ -36,28 +39,25 @@ Bag TreeNode::getBag(){
 vector<ClassicSignature> TreeNode::getSigSet(){
 	return sigSet;
 }
-	
+		
 	
 unsigned TreeNode::getIdToCover(){
 	
-	cout << "GETIDTOCOVER" << endl;
+	///cout << "GETIDTOCOVER" << endl;
 	
 	//parent->toString();
 	
 	vector<unsigned> parentBg = (parent->getBag()).getContent();
-	cout << "GETIDTOCOVER A2" << endl;
 	vector<unsigned> bg = bag.getContent();
-	
-	cout << "GETIDTOCOVER B" << endl;
+
 	
 	//Normal Case
 	for(unsigned j=0; j<bg.size(); j++){
 		if(find(parentBg.begin(), parentBg.end(), bg[j])==parentBg.end()){
+			///cout << "ID to Cover : " <<  bg[j] << endl; 
 			return bg[j];
 		}
 	}
-	
-	cout << "GETIDTOCOVER ERROR" << endl;
 	
 	//Case all of vertice are in parent's bag, return error
 	unsigned errorBag = 0;
@@ -66,21 +66,21 @@ unsigned TreeNode::getIdToCover(){
 }
 	
 // OTHER
-void TreeNode::addParent(TreeNode* tn){
-	cout << "Parent to add:" << endl;
-	tn->toString();
+void TreeNode::addParent(TreeNode tn){
+	///cout << "Parent to add:" << endl;
+	///tn.toString();
 	
 	/*
 	parent = (TreeNode*) malloc(sizeof(TreeNode));
 	*parent = tn;
 	*/
 	
-	parent = tn;
+	*parent = tn;
 	isRoot = false;
 	
-	cout << "adding parent:" << endl;
-	parent->toString();
-	cout << "ADDED A PARENT !" << endl;
+	///cout << "adding parent:" << endl;
+	///parent->toString();
+	///cout << "ADDED A PARENT !" << endl;
 }
 
 void TreeNode::addChild(TreeNode tn){
@@ -115,7 +115,7 @@ vector<vector<ClassicSignature>> TreeNode::getChildrenSigSet(vector<Node> graph)
 		children[i].computeMySigSet(graph);
 		childrenSigSet.push_back(children[i].getSigSet());
 	}
-	cout << "RETURNED CHILDRENSIGSET" << endl;
+	///cout << "RETURNED CHILDRENSIGSET" << endl;
 	
 	return childrenSigSet;
 }
@@ -126,6 +126,9 @@ void TreeNode::toString(){
 		cout << " root " << endl;
 	}
 	else{cout << " no root " << endl;}
+	cout << "Parent : " << endl;
+	(parent->bag).toString();
+	
 }
 
 
@@ -134,25 +137,25 @@ void TreeNode::toString(){
 
 
 void TreeNode::computeMySigSet(vector<Node> graph){
-	cout << "CPT-MYSGST" << endl;
+	///cout << "CPT-MYSGST" << endl;
 	
 	if(children.size() == 0){ // Leaf, starting point
-		cout << "CHILDCOMPUTE" << endl;
+		///cout << "CHILDCOMPUTE" << endl;
 		
 		ClassicSignature newSig = ClassicSignature(bag);
-		cout << "CHILDCOMPUTE B" << endl;
+		///cout << "CHILDCOMPUTE B" << endl;
 		
 		unsigned idToCover = getIdToCover();
 		
-		cout << "CHILDCOMPUTE C" << endl;
+		///cout << "CHILDCOMPUTE C" << endl;
 		sigSet = newSig.update(idToCover, graph);
 		
-		cout << "CHILD DONE" << endl;
+		///cout << "CHILD DONE" << endl;
 		return;
 	}
 	
 	// = Case NOT leaf =
-	cout << "PARENTCOMPUTE" << endl;
+	///cout << "PARENTCOMPUTE" << endl;
 	
 	// Gather children signatures
 	vector<vector<ClassicSignature>> childrenSigSets = getChildrenSigSet(graph);
@@ -160,6 +163,7 @@ void TreeNode::computeMySigSet(vector<Node> graph){
 	
 	vector<unsigned> iVect = vector<unsigned> (n, 0);
 	
+	///cout << " Final Computation " << endl;
 	while(iVect[0] < childrenSigSets[0].size()){
 		// select a combination
 		vector<ClassicSignature> chosenSigs;
@@ -186,11 +190,14 @@ void TreeNode::computeMySigSet(vector<Node> graph){
 		
 		// Now compute sum
 		ClassicSignature sumSig = sumSignature(chosenSigs, graph);
-		
 		// And compute all signatures deduced from it
 		unsigned idToCover = getIdToCover();
+		
+		///cout << " Ready to update" << endl;
 		vector<ClassicSignature> newSigs = sumSig.update(idToCover, graph);
 		
+		
+		///cout << "update done" << endl;
 		// Finally, store them in my sigSet
 		for(unsigned l=0; l<newSigs.size(); l++){
 			sigSet.push_back(newSigs[l]);
@@ -215,13 +222,13 @@ ClassicSignature TreeNode::sumSignature(vector<ClassicSignature> chosenSigs, vec
 			sumBag.add(ids[j]);
 		}
 	}
+	
 	sumSig = ClassicSignature(sumBag);
 	
 	
 	// Prepare the sticker vector to all STK_F
 	vector<unsigned> bg = sumBag.getContent();
 	vector<unsigned> sumStk = vector<unsigned> (bg.size(), STK_F);
-	
 	
 	// sum the stickers
 	for(unsigned index=0; index<bg.size(); index++){
@@ -259,6 +266,11 @@ ClassicSignature TreeNode::sumSignature(vector<ClassicSignature> chosenSigs, vec
 		}
 	}
 	
+	//Set Stickers in SumSig
+	for(unsigned index=0; index<bg.size(); index++){
+		sumSig.setSticker(bg[index], sumStk[index]);
+	}
+	
 	// Sum the selected vectors (no risk of adding the same id twice in the selection)
 	for(unsigned i=0; i<chosenSigs.size(); i++){
 		vector<unsigned> sld = chosenSigs[i].getSelectedID();
@@ -266,6 +278,8 @@ ClassicSignature TreeNode::sumSignature(vector<ClassicSignature> chosenSigs, vec
 			sumSig.select(sld[j]);
 		}
 	}
+	
+	return sumSig;
 }
 
 

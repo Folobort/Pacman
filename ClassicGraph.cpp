@@ -37,7 +37,7 @@ void ClassicGraph::treeDecomposition(){
 	GraphAux gAux = GraphAux(graph); /// Copy of the node structure ("newAdj")
 		
 	while(gAux.hasNodes()){ /// "adjList not empty"
-		cout << "========" << endl;
+		///cout << "========" << endl;
 		
 		// Case gAux is complete
 		if(gAux.isComplete()){
@@ -45,15 +45,15 @@ void ClassicGraph::treeDecomposition(){
 			
 			Bag bag = Bag(u.getNeighborsID());
 			bag.add(u.getID());
-			cout << "Final Bag : ";
-			bag.toString();
+			///cout << "Final Bag : ";
+			///bag.toString();
 			
 			treeDec.addBag(bag);
 			
 			gAux = GraphAux(); // Quickly empties the graph
 			
-			cout << "Final graph : " << endl;
-			gAux.toString();
+			///cout << "Final graph : " << endl;
+			///gAux.toString();
 			
 			continue;
 		}
@@ -66,16 +66,17 @@ void ClassicGraph::treeDecomposition(){
 		Bag bag = Bag(u.getNeighborsID());
 		bag.add(u.getID());
 		
-		cout << "New Bag : ";
-		bag.toString();
+		///cout << "New Bag : ";
+		///bag.toString();
 		
 		treeDec.addBag(bag);
 		
 		// Remove the node and clickify the neighbors
 		gAux.removeAndLink(u);
 		
-		cout << "New graph : " << endl;
-		gAux.toString();
+		///cout << "New graph : " << endl;
+		///gAux.toString();
+		
 	}
 }
 
@@ -514,7 +515,11 @@ string ClassicGraph::toString(){
 	for(unsigned i=0; i<graph.size(); i++){
 		string shapeStr;
 		/// TODO : selected cases
-		shapeStr = "shape = circle";
+		if(find(bestSelectedSet.begin(), bestSelectedSet.end(), graph[i].getID()) != bestSelectedSet.end()){
+			shapeStr = "shape = box";
+		} else{
+			shapeStr = "shape = circle";
+		}
 		
 		ss << graph[i].getID() << "[" << shapeStr << "];" << endl;
 	}
@@ -534,7 +539,7 @@ string ClassicGraph::toString(){
 	ss << "}";
 	
 	//////////////
-	treeDec.toString();
+	//treeDec.toString();
 	
 	return ss.str();
 }

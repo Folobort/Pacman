@@ -503,6 +503,8 @@ int main(){
 	g.treeDecomposition();
 	g.toString();
 	g.solveTree();
+	cout << g.toString() << endl;
+	
 /*	
 	vector<unsigned> S;
 	vector<unsigned> dominant = g.k_dominant(3, S);

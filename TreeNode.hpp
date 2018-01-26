@@ -23,12 +23,14 @@ class TreeNode{
 	public:
 	
 	// CONSTRUCTORS
+	TreeNode();
 	TreeNode(Bag bag);
 	TreeNode(vector<unsigned> bag);
 	
 	// GETTERS
 	bool getIsRoot();
 	Bag getBag();
+	
 	
 	vector<ClassicSignature> getSigSet();
 	
@@ -37,7 +39,7 @@ class TreeNode{
 	Node getNodeWithID(unsigned id, vector<Node> graph);
 	
 	// OTHER
-	void addParent(TreeNode* tn);
+	void addParent(TreeNode tn);
 	void addChild(TreeNode tn);
 	
 	bool isGreaterThan(TreeNode tn);

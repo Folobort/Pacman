@@ -1,4 +1,8 @@
-
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
 #include <vector>
 #include <algorithm>
 
@@ -57,3 +61,15 @@ void Node::removeNeighbor(unsigned v){
 		neighborsID.erase(it);
 	}
 }
+
+
+
+// TO STRING
+
+void Node::toString(){
+	cout << " Node : " << id << " neighbors : ";
+	for(unsigned i=0; i<neighborsID.size(); i++){
+		cout << neighborsID[i] << " - ";
+	}
+	cout << endl;
+} 

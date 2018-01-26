@@ -1,6 +1,11 @@
 #ifndef NODE_H_
 #define NODE_H_
 
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -29,6 +34,10 @@ class Node{
 	void addNeighbor(unsigned v);			// Add if not already present (and not itself)
 	void addNeighbors(vector<unsigned> v);
 	void removeNeighbor(unsigned v);		// Remove if present
+
+
+	// TOSTRING
+	void toString();
 };
 
 

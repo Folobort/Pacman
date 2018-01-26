@@ -69,8 +69,8 @@ void Signature::removeLastFromBag(){
 
 // GETTERS
 int ClassicSignature::getIndex(unsigned id){
+	///cout << "coucou" << endl;
 	vector<unsigned> bag = treeBag.getContent();
-	
 	for(unsigned i=0; i<bag.size(); i++){
 		if(bag[i] == id){
 			return i;
@@ -163,13 +163,18 @@ vector<ClassicSignature> ClassicSignature::update(unsigned idToCover, vector<Nod
 
 	// We take the point to be removed next, and its neighbors in the graph.
 	Node u = getNodeWithID(idToCover, graph);
+	
+	///cout << "Node found : "<< endl;
+	///u.toString();
+	///cout << "STICKER SIZE : " << stickers.size() << endl;
 	unsigned stk = getSticker(idToCover);
 	
+	///cout << "Recover sticker " << endl;
 	vector<unsigned> nb = u.getNeighborsID();
 	
 	
 	
-	
+	///cout << "updating with node to cover : " << u.getID() << endl;
 	
 	if(stk == STK_F){ /// Free (not covered): we need to select this point or a neighbor (so deg+1 new signatures)
 		for(unsigned i=0; i<nb.size(); i++){ // select a neighbor

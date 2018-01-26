@@ -44,18 +44,9 @@ void TreeDec::addBag(Bag bag){
 	for(vector<TreeNode>::iterator it = roots.begin(); it != roots.end(); it++){
 		if(tn.isGreaterThan(*it)){
 			tn.addChild(*it);
-			
-			it->addParent(&tn);
-			
-			/* nice try, doesn't work
-			TreeNode* tnMalloc = (TreeNode*) malloc(sizeof(TreeNode));
-			*tnMalloc = tn;
-			
-			it->addParent(tnMalloc);
-			*/
+			it->addParent(tn);
 		}
 	}
-	cout << "lololo" << endl;
 	// clean the root list (starting at the end to keep track of iterator when erasing)
 	vector<TreeNode>::iterator it = roots.end()-1;
 	while(it != roots.begin()){
@@ -84,10 +75,10 @@ void TreeDec::toString(){
 
 vector<unsigned> TreeDec::computeBestSelected(vector<Node> graph){
 	// Only compute the first root sigSet (this function is usually called when there is only one)
-	cout << "FCA" << endl;
+	///cout << "FCA" << endl;
 	roots[0].computeMySigSet(graph);
 	
-	cout << "FCB" << endl;
+	///cout << "FCB" << endl;
 	
 	
 	// get root SigSet
