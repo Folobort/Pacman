@@ -80,6 +80,11 @@ bool GraphAux::isComplete(){
 }
 
 void GraphAux::toString(){
+	if(graph.size() == 0){
+		cout << "EMPTY GRAPH" << endl;
+		return;
+	}
+	
 	for(unsigned i=0; i<graph.size(); i++){
 		cout << graph[i].getID() << " : ";
 		vector<unsigned> v= graph[i].getNeighborsID();
@@ -92,6 +97,11 @@ void GraphAux::toString(){
 
 
 
+
+
+Node GraphAux::getFirstNode(){
+	return graph[0];
+}
 
 
 

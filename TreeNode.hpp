@@ -37,7 +37,7 @@ class TreeNode{
 	Node getNodeWithID(unsigned id, vector<Node> graph);
 	
 	// OTHER
-	void addParent(TreeNode tn);
+	void addParent(TreeNode* tn);
 	void addChild(TreeNode tn);
 	
 	bool isGreaterThan(TreeNode tn);

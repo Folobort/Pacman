@@ -66,7 +66,6 @@ class ClassicSignature{
 	
 	void remove(unsigned id);
 
-
 	vector<ClassicSignature> update(unsigned idToCover, vector<Node> graph);
 	ClassicSignature updateF(unsigned idToCover, unsigned idSelected, vector<Node> graph);
 	ClassicSignature updateS(unsigned idSelected, vector<Node> graph);

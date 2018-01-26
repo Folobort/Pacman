@@ -44,7 +44,15 @@ void TreeDec::addBag(Bag bag){
 	for(vector<TreeNode>::iterator it = roots.begin(); it != roots.end(); it++){
 		if(tn.isGreaterThan(*it)){
 			tn.addChild(*it);
-			it->addParent(tn);
+			
+			it->addParent(&tn);
+			
+			/* nice try, doesn't work
+			TreeNode* tnMalloc = (TreeNode*) malloc(sizeof(TreeNode));
+			*tnMalloc = tn;
+			
+			it->addParent(tnMalloc);
+			*/
 		}
 	}
 	cout << "lololo" << endl;
@@ -68,6 +76,88 @@ void TreeDec::addBag(vector<unsigned> bag){
 	addBag(Bag(bag));
 }
 	
+void TreeDec::toString(){
+	for(unsigned i=0; i<roots.size(); i++){
+		roots[i].toString();
+	}
+}	
+
+vector<unsigned> TreeDec::computeBestSelected(vector<Node> graph){
+	// Only compute the first root sigSet (this function is usually called when there is only one)
+	cout << "FCA" << endl;
+	roots[0].computeMySigSet(graph);
+	
+	cout << "FCB" << endl;
+	
+	
+	// get root SigSet
+	vector<ClassicSignature> sigSet = roots[0].getSigSet();
+	unsigned n = sigSet[0].getBag().getContent().size(); // size of the last bag
+	
+	// reduce last bag
+	for(unsigned i=0; i<n; i++){
+		unsigned id = sigSet[0].getBag().getContent()[0];
+		vector<ClassicSignature> newSigSet;
+		
+		for(unsigned j=0; j<sigSet.size(); j++){
+			vector<ClassicSignature> upd = sigSet[j].update(id, graph);
+			
+			for(unsigned k=0; k<upd.size(); k++){
+				newSigSet.push_back(upd[k]);
+			}
+		}
+		
+		sigSet = cleanSigSet(newSigSet);
+	}
+	
+	return sigSet[0].getSelectedID(); // In case of equally best sets, return only one selected set
+}
+
+
+
+
+
+vector<ClassicSignature> TreeDec::cleanSigSet(vector<ClassicSignature> sigSetToClean){
+	vector<ClassicSignature> cleanedSigs;
+	
+	vector<bool> keepIndex(sigSetToClean.size(), true);
+	
+	for(unsigned i=0; i<sigSetToClean.size(); i++){
+		if(keepIndex[i]){
+			for(unsigned j=i+1; j<sigSetToClean.size(); j++){
+				if(keepIndex[j] && sigSetToClean[i].equals(sigSetToClean[j])){ // same apparent signature
+					if(sigSetToClean[i].getSelectedID().size() <= sigSetToClean[j].getSelectedID().size()){
+						keepIndex[j] = false;
+					}else{
+						keepIndex[i] = false;
+					}
+				}
+			}
+		}
+	}
+	
+	for(unsigned i=0; i<sigSetToClean.size(); i++){
+		if(keepIndex[i]){
+			cleanedSigs.push_back(sigSetToClean[i]);
+		}
+	}
+	
+	return cleanedSigs;	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -67,7 +67,7 @@ class ClassicGraph{
     //Tree decomposition
 	TreeDec treeDec;
 
-	vector<Signature> sigSet;
+	vector<unsigned> bestSelectedSet;	// The best dominating set of nodes dominating the grid
 
 	// == PROTOTYPES ==
     public:
@@ -81,6 +81,7 @@ class ClassicGraph{
 
     //Tree decomposition
     void treeDecomposition();
+    void solveTree();
     
     //other stuff to sort
     
@@ -98,6 +99,8 @@ class ClassicGraph{
     
     //TO STRING
     string toString();
+    
+    
     
     /*
     bool isComplete(vector<vector<unsigned>> adjacencyList);

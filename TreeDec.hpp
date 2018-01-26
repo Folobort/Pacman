@@ -24,6 +24,11 @@ class TreeDec{
 	// OTHER
 	void addBag(Bag bag);
 	void addBag(vector<unsigned> bag);
+	
+	void toString();
+	
+	vector<unsigned> computeBestSelected(vector<Node> graph);
+	vector<ClassicSignature> cleanSigSet(vector<ClassicSignature> sigSetToClean);
 };
 
 

@@ -37,13 +37,23 @@ void ClassicGraph::treeDecomposition(){
 	GraphAux gAux = GraphAux(graph); /// Copy of the node structure ("newAdj")
 		
 	while(gAux.hasNodes()){ /// "adjList not empty"
+		cout << "========" << endl;
+		
 		// Case gAux is complete
 		if(gAux.isComplete()){
-			Bag bag = Bag(graph[0].getNeighborsID());
-			bag.add(graph[0].getID());
+			Node u = gAux.getFirstNode();
+			
+			Bag bag = Bag(u.getNeighborsID());
+			bag.add(u.getID());
+			cout << "Final Bag : ";
+			bag.toString();
+			
 			treeDec.addBag(bag);
 			
 			gAux = GraphAux(); // Quickly empties the graph
+			
+			cout << "Final graph : " << endl;
+			gAux.toString();
 			
 			continue;
 		}
@@ -523,6 +533,9 @@ string ClassicGraph::toString(){
 
 	ss << "}";
 	
+	//////////////
+	treeDec.toString();
+	
 	return ss.str();
 }
 
@@ -565,6 +578,17 @@ bool ClassicGraph::isComplete(vector<vector<unsigned>> adjacencyList){
     return true;
 }
 */
+
+
+
+
+void ClassicGraph::solveTree(){
+	bestSelectedSet = treeDec.computeBestSelected(graph);
+}
+
+
+
+
 
 
 

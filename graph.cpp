@@ -495,9 +495,14 @@ int main(){
 	vector<Node> graph=p.parse("testparser.txt");
 	ClassicGraph g= ClassicGraph(graph);
 	
+	/*
 	cout << "Graph from gengraph" << endl;
 	cout << g.toString() << endl;
+	*/
 	
+	g.treeDecomposition();
+	g.toString();
+	g.solveTree();
 /*	
 	vector<unsigned> S;
 	vector<unsigned> dominant = g.k_dominant(3, S);

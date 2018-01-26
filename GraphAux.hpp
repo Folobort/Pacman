@@ -19,7 +19,7 @@ class GraphAux{
 	GraphAux();
 	
 	// GETTERS
-	
+	Node getFirstNode();
 	
 	// OTHER
 	Node getNodeDegmin();

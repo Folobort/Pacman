@@ -39,8 +39,16 @@ vector<ClassicSignature> TreeNode::getSigSet(){
 	
 	
 unsigned TreeNode::getIdToCover(){
-	vector<unsigned> parentBg = parent->getBag().getContent();
+	
+	cout << "GETIDTOCOVER" << endl;
+	
+	//parent->toString();
+	
+	vector<unsigned> parentBg = (parent->getBag()).getContent();
+	cout << "GETIDTOCOVER A2" << endl;
 	vector<unsigned> bg = bag.getContent();
+	
+	cout << "GETIDTOCOVER B" << endl;
 	
 	//Normal Case
 	for(unsigned j=0; j<bg.size(); j++){
@@ -49,6 +57,8 @@ unsigned TreeNode::getIdToCover(){
 		}
 	}
 	
+	cout << "GETIDTOCOVER ERROR" << endl;
+	
 	//Case all of vertice are in parent's bag, return error
 	unsigned errorBag = 0;
 	errorBag--;
@@ -56,9 +66,21 @@ unsigned TreeNode::getIdToCover(){
 }
 	
 // OTHER
-void TreeNode::addParent(TreeNode tn){
-	parent = &tn;
+void TreeNode::addParent(TreeNode* tn){
+	cout << "Parent to add:" << endl;
+	tn->toString();
+	
+	/*
+	parent = (TreeNode*) malloc(sizeof(TreeNode));
+	*parent = tn;
+	*/
+	
+	parent = tn;
 	isRoot = false;
+	
+	cout << "adding parent:" << endl;
+	parent->toString();
+	cout << "ADDED A PARENT !" << endl;
 }
 
 void TreeNode::addChild(TreeNode tn){
@@ -93,6 +115,8 @@ vector<vector<ClassicSignature>> TreeNode::getChildrenSigSet(vector<Node> graph)
 		children[i].computeMySigSet(graph);
 		childrenSigSet.push_back(children[i].getSigSet());
 	}
+	cout << "RETURNED CHILDRENSIGSET" << endl;
+	
 	return childrenSigSet;
 }
 
@@ -110,16 +134,25 @@ void TreeNode::toString(){
 
 
 void TreeNode::computeMySigSet(vector<Node> graph){
+	cout << "CPT-MYSGST" << endl;
+	
 	if(children.size() == 0){ // Leaf, starting point
+		cout << "CHILDCOMPUTE" << endl;
+		
 		ClassicSignature newSig = ClassicSignature(bag);
+		cout << "CHILDCOMPUTE B" << endl;
 		
 		unsigned idToCover = getIdToCover();
+		
+		cout << "CHILDCOMPUTE C" << endl;
 		sigSet = newSig.update(idToCover, graph);
 		
+		cout << "CHILD DONE" << endl;
 		return;
 	}
 	
 	// = Case NOT leaf =
+	cout << "PARENTCOMPUTE" << endl;
 	
 	// Gather children signatures
 	vector<vector<ClassicSignature>> childrenSigSets = getChildrenSigSet(graph);
