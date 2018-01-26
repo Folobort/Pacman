@@ -455,7 +455,7 @@ int main(){
 	unsigned k = 1;
 
 	Parser p;
-	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_pico.pbm");
+	vector<vector<bool>> matrix = p.parse("maps/testMap.pbm");
 
 	Graph g = Graph(matrix);
 
@@ -466,9 +466,9 @@ int main(){
 	cout << "===============" << endl;
 	cout << "best dist with k = " << k << " : " << bestDist << endl;
 	cout << "===============" << endl;
-
+*/
 	/// Branch and bound
-
+/*
 	vector<Point> kDom = g.k_dominant(k);
 
 	if(kDom.size() != 0){
@@ -502,8 +502,7 @@ int main(){
 
 
 	return 0;
-*/
-
+	*/
 }
 
 
