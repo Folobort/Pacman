@@ -35,41 +35,8 @@ ClassicSignature ClassicSignature::copy(){
 	return newSig;
 }
 
-
-/*
-Signature Signature::updateBagWith(Point newPoint){
-	Signature newSig;
-	
-	// Equivalent to a bag.push_front(newPoint); stickers.push_front(STK_F);
-	newSig.bag.push_back(newPoint);
-	newSig.stickers.push_back(STK_F);
-	for(unsigned index=0; index<bag.size(); index++){
-		newSig.bag.push_back(bag[index]);
-		newSig.stickers.push_back(stickers[index]);
-	}
-	
-	// Copy of selected
-	newSig.selected = selected;
-	
-	// remove last point now (does update selected if necessary)
-	newSig.removeLastFromBag();
-	
-	return newSig;
-}
-*/
-
-
-//May be useless in classic graph case
-/*
-void Signature::removeLastFromBag(){
-	bag.pop_back();
-	stickers.pop_back();
-}
-*/
-
 // GETTERS
 int ClassicSignature::getIndex(unsigned id){
-	///cout << "coucou" << endl;
 	vector<unsigned> bag = treeBag.getContent();
 	for(unsigned i=0; i<bag.size(); i++){
 		if(bag[i] == id){
@@ -85,7 +52,7 @@ unsigned ClassicSignature::getSticker(unsigned id){
 	if(index != -1){
 		return stickers[index];
 	} else{
-		cout << "OLALA KESKISPASS SIGNATURE::GETSTICKER" << endl;
+		cout << "SIGNATURE::GETSTICKER" << endl;
 		return 23;
 	}
 }
@@ -155,8 +122,6 @@ void ClassicSignature::remove(unsigned id){
 }
 
 
-
-/// OK, TO COMPILE
 vector<ClassicSignature> ClassicSignature::update(unsigned idToCover, vector<Node> graph){
 	vector<ClassicSignature> newSigs;
 	ClassicSignature newSig;
@@ -164,17 +129,9 @@ vector<ClassicSignature> ClassicSignature::update(unsigned idToCover, vector<Nod
 	// We take the point to be removed next, and its neighbors in the graph.
 	Node u = getNodeWithID(idToCover, graph);
 	
-	///cout << "Node found : "<< endl;
-	///u.toString();
-	///cout << "STICKER SIZE : " << stickers.size() << endl;
 	unsigned stk = getSticker(idToCover);
 	
-	///cout << "Recover sticker " << endl;
 	vector<unsigned> nb = u.getNeighborsID();
-	
-	
-	
-	///cout << "updating with node to cover : " << u.getID() << endl;
 	
 	if(stk == STK_F){ /// Free (not covered): we need to select this point or a neighbor (so deg+1 new signatures)
 		for(unsigned i=0; i<nb.size(); i++){ // select a neighbor
@@ -205,8 +162,6 @@ vector<ClassicSignature> ClassicSignature::update(unsigned idToCover, vector<Nod
 }
 
 
-
-///OK TO COMPILE
 ClassicSignature ClassicSignature::updateF(unsigned idToCover, unsigned idSelected, vector<Node> graph){
 	ClassicSignature newSig = copy();
 	newSig.remove(idToCover);
@@ -229,8 +184,6 @@ ClassicSignature ClassicSignature::updateF(unsigned idToCover, unsigned idSelect
 	return newSig;
 }
 
-
-/// OK, TO COMPILE
 ClassicSignature ClassicSignature::updateS(unsigned idSelected, vector<Node> graph){
 	
 	ClassicSignature newSig = updateF(idSelected, idSelected, graph);
@@ -239,7 +192,6 @@ ClassicSignature ClassicSignature::updateS(unsigned idSelected, vector<Node> gra
 	return newSig;
 }
 
-/// OK, TO COMPILE
 ClassicSignature ClassicSignature::updateC(unsigned idCovered){
 	ClassicSignature newSig = copy();
 	newSig.remove(idCovered);

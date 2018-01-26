@@ -42,19 +42,12 @@ vector<ClassicSignature> TreeNode::getSigSet(){
 		
 	
 unsigned TreeNode::getIdToCover(){
-	
-	///cout << "GETIDTOCOVER" << endl;
-	
-	//parent->toString();
-	
 	vector<unsigned> parentBg = (parent->getBag()).getContent();
 	vector<unsigned> bg = bag.getContent();
 
-	
 	//Normal Case
 	for(unsigned j=0; j<bg.size(); j++){
 		if(find(parentBg.begin(), parentBg.end(), bg[j])==parentBg.end()){
-			///cout << "ID to Cover : " <<  bg[j] << endl; 
 			return bg[j];
 		}
 	}
@@ -67,20 +60,8 @@ unsigned TreeNode::getIdToCover(){
 	
 // OTHER
 void TreeNode::addParent(TreeNode tn){
-	///cout << "Parent to add:" << endl;
-	///tn.toString();
-	
-	/*
-	parent = (TreeNode*) malloc(sizeof(TreeNode));
-	*parent = tn;
-	*/
-	
 	*parent = tn;
 	isRoot = false;
-	
-	///cout << "adding parent:" << endl;
-	///parent->toString();
-	///cout << "ADDED A PARENT !" << endl;
 }
 
 void TreeNode::addChild(TreeNode tn){
@@ -115,7 +96,6 @@ vector<vector<ClassicSignature>> TreeNode::getChildrenSigSet(vector<Node> graph)
 		children[i].computeMySigSet(graph);
 		childrenSigSet.push_back(children[i].getSigSet());
 	}
-	///cout << "RETURNED CHILDRENSIGSET" << endl;
 	
 	return childrenSigSet;
 }
@@ -137,25 +117,16 @@ void TreeNode::toString(){
 
 
 void TreeNode::computeMySigSet(vector<Node> graph){
-	///cout << "CPT-MYSGST" << endl;
-	
 	if(children.size() == 0){ // Leaf, starting point
-		///cout << "CHILDCOMPUTE" << endl;
-		
 		ClassicSignature newSig = ClassicSignature(bag);
-		///cout << "CHILDCOMPUTE B" << endl;
 		
 		unsigned idToCover = getIdToCover();
-		
-		///cout << "CHILDCOMPUTE C" << endl;
 		sigSet = newSig.update(idToCover, graph);
 		
-		///cout << "CHILD DONE" << endl;
 		return;
 	}
 	
 	// = Case NOT leaf =
-	///cout << "PARENTCOMPUTE" << endl;
 	
 	// Gather children signatures
 	vector<vector<ClassicSignature>> childrenSigSets = getChildrenSigSet(graph);
@@ -163,7 +134,6 @@ void TreeNode::computeMySigSet(vector<Node> graph){
 	
 	vector<unsigned> iVect = vector<unsigned> (n, 0);
 	
-	///cout << " Final Computation " << endl;
 	while(iVect[0] < childrenSigSets[0].size()){
 		// select a combination
 		vector<ClassicSignature> chosenSigs;
@@ -193,11 +163,9 @@ void TreeNode::computeMySigSet(vector<Node> graph){
 		// And compute all signatures deduced from it
 		unsigned idToCover = getIdToCover();
 		
-		///cout << " Ready to update" << endl;
 		vector<ClassicSignature> newSigs = sumSig.update(idToCover, graph);
 		
 		
-		///cout << "update done" << endl;
 		// Finally, store them in my sigSet
 		for(unsigned l=0; l<newSigs.size(); l++){
 			sigSet.push_back(newSigs[l]);

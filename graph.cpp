@@ -451,16 +451,16 @@ string Graph::toString(){
 /// -MAIN CALL-
 int main(){
 /// GRID MAIN	
-/*
+
 	unsigned k = 1;
 
 	Parser p;
-	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_femtoTest.pbm");
+	vector<vector<bool>> matrix = p.parse("maps/lol_map_ascii_pico.pbm");
 
 	Graph g = Graph(matrix);
 
 	/// Dijkstra
-
+/*
 	unsigned bestDist = g.bestDijkstra(k);
 
 	cout << "===============" << endl;
@@ -480,7 +480,7 @@ int main(){
 	} else{
 		cout << "Does not dominate with any set of size " << k << endl;
 	}
-
+*/
 	/// Tree Decomposition
 	g.treeDecomposition();
 	g.solveTree();
@@ -488,35 +488,22 @@ int main(){
 	cout << g.toString() << endl;
 	
 	return 0;
-*/
+
 
 /// CLASSIC MAIN
+/*
 	ClassicParser p;
-	vector<Node> graph=p.parse("testparser.txt");
+	vector<Node> graph=p.parse("test.txt");
 	ClassicGraph g= ClassicGraph(graph);
 	
-	/*
-	cout << "Graph from gengraph" << endl;
-	cout << g.toString() << endl;
-	*/
-	
 	g.treeDecomposition();
-	g.toString();
 	g.solveTree();
 	cout << g.toString() << endl;
-	
-/*	
-	vector<unsigned> S;
-	vector<unsigned> dominant = g.k_dominant(3, S);
-	
-	cout << "Sommet dominants : " << endl;
-	for(unsigned j=0; j<dominant.size(); j++){
-		cout << dominant[j] << endl;
-	}
-*/
-	
+
 
 	return 0;
+*/
+
 }
 
 

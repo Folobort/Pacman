@@ -75,11 +75,7 @@ void TreeDec::toString(){
 
 vector<unsigned> TreeDec::computeBestSelected(vector<Node> graph){
 	// Only compute the first root sigSet (this function is usually called when there is only one)
-	///cout << "FCA" << endl;
 	roots[0].computeMySigSet(graph);
-	
-	///cout << "FCB" << endl;
-	
 	
 	// get root SigSet
 	vector<ClassicSignature> sigSet = roots[0].getSigSet();
